@@ -675,6 +675,17 @@
           <span style="color:#ffd700">⭐ TOP</span> = SP9/SP-X Werksteams
         </div>
 
+        <div style="position:relative;margin-bottom:10px">
+          <input type="text" id="teams-search" placeholder="🔍 Team oder Fahrer suchen…"
+            oninput="searchTeams(this.value)"
+            style="width:100%;box-sizing:border-box;padding:9px 12px 9px 36px;border-radius:10px;
+              border:0.5px solid var(--border2);background:var(--surface);color:var(--text);
+              font-size:13px;outline:none">
+          <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🔍</span>
+          <button id="teams-search-clear" onclick="clearTeamSearch()" style="display:none;position:absolute;
+            right:10px;top:50%;transform:translateY(-50%);background:none;border:none;
+            color:var(--text2);font-size:16px;cursor:pointer;padding:0;line-height:1">✕</button>
+        </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
           <button class="pack-filter-btn active" onclick="filterTeamsByClass('alle',this)" style="font-size:10px;padding:3px 8px">Alle (124)</button>
           <button class="pack-filter-btn" onclick="filterTeamsByClass('AT2',this)" style="font-size:10px;padding:3px 8px">AT2</button><button class="pack-filter-btn" onclick="filterTeamsByClass('BMW 325i',this)" style="font-size:10px;padding:3px 8px">BMW 325i</button><button class="pack-filter-btn" onclick="filterTeamsByClass('BMW M2',this)" style="font-size:10px;padding:3px 8px">BMW M2</button><button class="pack-filter-btn" onclick="filterTeamsByClass('BMW M240i',this)" style="font-size:10px;padding:3px 8px">BMW M240i</button><button class="pack-filter-btn" onclick="filterTeamsByClass('Cup 2',this)" style="font-size:10px;padding:3px 8px">Cup 2</button><button class="pack-filter-btn" onclick="filterTeamsByClass('Cup 3',this)" style="font-size:10px;padding:3px 8px">Cup 3</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 10',this)" style="font-size:10px;padding:3px 8px">SP 10</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 2T',this)" style="font-size:10px;padding:3px 8px">SP 2T</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 3',this)" style="font-size:10px;padding:3px 8px">SP 3</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 3T',this)" style="font-size:10px;padding:3px 8px">SP 3T</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 4T',this)" style="font-size:10px;padding:3px 8px">SP 4T</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 7',this)" style="font-size:10px;padding:3px 8px">SP 7</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP 9',this)" style="font-size:10px;padding:3px 8px">SP 9</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP-PRO',this)" style="font-size:10px;padding:3px 8px">SP-PRO</button><button class="pack-filter-btn" onclick="filterTeamsByClass('SP-X',this)" style="font-size:10px;padding:3px 8px">SP-X</button><button class="pack-filter-btn" onclick="filterTeamsByClass('TCR',this)" style="font-size:10px;padding:3px 8px">TCR</button><button class="pack-filter-btn" onclick="filterTeamsByClass('V5',this)" style="font-size:10px;padding:3px 8px">V5</button><button class="pack-filter-btn" onclick="filterTeamsByClass('V6',this)" style="font-size:10px;padding:3px 8px">V6</button><button class="pack-filter-btn" onclick="filterTeamsByClass('VT2 Front',this)" style="font-size:10px;padding:3px 8px">VT2 Front</button><button class="pack-filter-btn" onclick="filterTeamsByClass('VT2 Heck',this)" style="font-size:10px;padding:3px 8px">VT2 Heck</button>
@@ -1922,11 +1933,57 @@ window.toggleTeamDetail = function(nr) {
   if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 };
 
+window.searchTeams = function(query) {
+  const q = query.trim().toLowerCase();
+  const clearBtn = document.getElementById('teams-search-clear');
+  if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+
+  // Reset class filter buttons to "Alle" when searching
+  if (q) {
+    const sec = document.getElementById('sec-teams');
+    if (sec) sec.querySelectorAll('.pack-filter-btn').forEach(b => b.classList.remove('active'));
+    const alleBtn = document.querySelector('#sec-teams .pack-filter-btn');
+    if (alleBtn) alleBtn.classList.add('active');
+  }
+
+  document.querySelectorAll('#teams-list > div[data-class]').forEach(card => {
+    if (!q) { card.style.display = ''; return; }
+    // Search in team name, car, class, and driver names (in detail div)
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? '' : 'none';
+  });
+
+  // Show "no results" message
+  const list = document.getElementById('teams-list');
+  const existing = document.getElementById('teams-no-results');
+  const visible = Array.from(list.querySelectorAll('div[data-class]')).filter(c => c.style.display !== 'none');
+  if (existing) existing.remove();
+  if (q && visible.length === 0) {
+    const msg = document.createElement('div');
+    msg.id = 'teams-no-results';
+    msg.style.cssText = 'text-align:center;padding:24px;color:var(--text2);font-size:13px';
+    msg.textContent = 'Keine Treffer für „' + query + '"';
+    list.appendChild(msg);
+  }
+};
+
+window.clearTeamSearch = function() {
+  const inp = document.getElementById('teams-search');
+  if (inp) { inp.value = ''; searchTeams(''); inp.focus(); }
+};
+
 window.filterTeamsByClass = function(cls, btn) {
   // Reset active on all team filter buttons specifically
   const sec = document.getElementById('sec-teams');
   if (sec) sec.querySelectorAll('.pack-filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  // Clear search when filtering by class
+  const inp = document.getElementById('teams-search');
+  if (inp) inp.value = '';
+  const clearBtn = document.getElementById('teams-search-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  const noRes = document.getElementById('teams-no-results');
+  if (noRes) noRes.remove();
   document.querySelectorAll('#teams-list > div[data-class]').forEach(card => {
     if (cls === 'alle') { card.style.display = ''; return; }
     card.style.display = (card.getAttribute('data-class') === cls) ? '' : 'none';

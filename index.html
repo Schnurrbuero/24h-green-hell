@@ -330,6 +330,7 @@
           <div class="sync-dot"></div><span>Live</span>
         </div>
         <button class="logout-btn" onclick="logout()">Abmelden</button>
+        <button class="logout-btn" onclick="deleteAccount()" style="opacity:0.6;font-size:11px" title="Benutzer aus Gruppe entfernen">✕ Löschen</button>
       </div>
     </div>
   </div>
@@ -794,6 +795,38 @@ function subscribeToGroup() {
     renderPackliste();
   });
 }
+
+window.deleteAccount = async function() {
+  const confirmed = confirm(
+    `Benutzer "${currentUser}" wirklich aus der Gruppe entfernen?\n\n` +
+    `Deine Ausgaben und Zahlungen werden ebenfalls gelöscht. ` +
+    `Du kannst der Gruppe danach nur durch erneutes Beitreten betreten.`
+  );
+  if (!confirmed) return;
+  try {
+    // Delete all expenses by this user
+    const expObj = groupSnapshot?.expenses || {};
+    const myExpIds = Object.entries(expObj)
+      .filter(([,e]) => e.who === currentUser)
+      .map(([id]) => id);
+    for (const id of myExpIds) {
+      await remove(ref(db, 'groups/' + currentGroupKey + '/expenses/' + id));
+    }
+    // Delete all payments involving this user
+    const payObj = groupSnapshot?.payments || {};
+    const myPayIds = Object.entries(payObj)
+      .filter(([,p]) => p.from === currentUser || p.to === currentUser)
+      .map(([id]) => id);
+    for (const id of myPayIds) {
+      await remove(ref(db, 'groups/' + currentGroupKey + '/payments/' + id));
+    }
+    // Remove from members list
+    await remove(ref(db, 'groups/' + currentGroupKey + '/members/' + currentUser));
+    window.logout();
+  } catch(e) {
+    alert('Fehler beim Löschen: ' + e.message);
+  }
+};
 
 window.logout = function() {
   if (unsubscribe) { unsubscribe(); unsubscribe = null; }

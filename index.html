@@ -1131,68 +1131,109 @@ function renderAbrechnung(expenses, members, payments) {
     container.innerHTML = '<div style="font-size:13px;color:var(--text2);text-align:center;padding:16px 0">Noch keine Ausgaben eingetragen</div>';
     return;
   }
+
+  // payments with id
+  const paymentsWithId = groupSnapshot?.payments
+    ? Object.entries(groupSnapshot.payments).map(([k,p]) => ({...p, id: p.id||k}))
+    : [];
+
   container.innerHTML = members.map((person, idx) => {
     const p = PALETTES[idx % PALETTES.length];
-    const myT = transfers.filter(t => t.from === person);
-    const myExpenses = expenses.filter(e => e.who === person);
-    const bal = paid[person] - share;
-    const chip = bal>0.005
+
+    // Balance = what they paid minus what they owe (correct, uses splitWith)
+    const bal = paid[person] - owed[person];
+    const chip = bal > 0.005
       ? `<span class="balance-chip chip-pos">+€ ${bal.toFixed(2)}</span>`
-      : bal<-0.005
+      : bal < -0.005
       ? `<span class="balance-chip chip-neg">−€ ${Math.abs(bal).toFixed(2)}</span>`
       : `<span class="balance-chip chip-zero">ausgeglichen</span>`;
-    // Ensure each payment has its id (support old records without id field)
-  const paymentsWithId = (groupSnapshot?.payments
-    ? Object.entries(groupSnapshot.payments).map(([k,p]) => ({...p, id: p.id||k}))
-    : payments);
-  const myDirect = paymentsWithId.filter(p => p.from === person || p.to === person);
+
+    // ── Detaillierte Aufschlüsselung: woran ist diese Person beteiligt? ──
+    const myOwedItems = expenses
+      .filter(e => {
+        const splitters = (e.splitWith && e.splitWith.length > 0)
+          ? e.splitWith.filter(m => members.includes(m))
+          : members;
+        return splitters.includes(person);
+      })
+      .map(e => {
+        const splitters = (e.splitWith && e.splitWith.length > 0)
+          ? e.splitWith.filter(m => members.includes(m))
+          : members;
+        const myShare = parseFloat(e.amount) / splitters.length;
+        const isPayer = e.who === person;
+        return {desc: e.desc, who: e.who, myShare, isPayer,
+                total: parseFloat(e.amount), n: splitters.length};
+      });
+
+    const myExpenses = expenses.filter(e => e.who === person);
+
+    const breakdownHtml = myOwedItems.length > 0
+      ? `<div class="exp-breakdown" id="breakdown-${idx}" style="display:none">
+          <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;
+            letter-spacing:0.5px;padding:4px 0 6px">Anteil pro Ausgabe</div>
+          ${myOwedItems.map(item => `
+            <div class="exp-breakdown-row" style="display:flex;align-items:center;gap:6px">
+              <span class="exp-breakdown-desc" style="flex:1">
+                ${item.desc}
+                ${item.isPayer ? '' : `<span style="font-size:10px;color:var(--text2)"> · bezahlt von ${item.who}</span>`}
+                ${item.n < members.length ? `<span style="font-size:10px;color:var(--text2)"> · ${item.n} Pers.</span>` : ''}
+              </span>
+              <span class="exp-breakdown-amt" style="${item.isPayer?'color:var(--text2)':''}">
+                ${item.isPayer ? '(bezahlt)' : '−'} € ${item.myShare.toFixed(2)}
+              </span>
+            </div>`).join('')}
+          ${myExpenses.length > 0 ? `<div style="border-top:0.5px solid var(--border);margin-top:6px;padding-top:6px;
+            font-size:11px;color:var(--text2)">Selbst bezahlt:
+            € ${myExpenses.reduce((s,e)=>s+parseFloat(e.amount),0).toFixed(2)}</div>` : ''}
+        </div>
+        <button class="exp-toggle-btn" onclick="toggleBreakdown(${idx},this)">
+          Aufschlüsselung anzeigen ▾
+        </button>`
+      : `<div class="pay-none" style="padding-left:0;padding-top:5px">Nicht an Ausgaben beteiligt</div>`;
+
+    // ── Direkte Zahlungen (erhalten/gegeben) ──
+    const myDirect = paymentsWithId.filter(p => p.from === person || p.to === person);
     const directHtml = myDirect.length > 0
       ? myDirect.map(p => {
           const isPayer = p.from === person;
           const canEdit = p.to === currentUser;
-          return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;padding:4px 8px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
-            <span style="font-size:10px;font-weight:600;color:#4a8fd4">${isPayer ? '✓ BEZAHLT' : '✓ ERHALTEN'}</span>
-            <span style="font-size:11px;color:var(--text2)">${isPayer ? 'an '+p.to : 'von '+p.from}${p.desc && p.desc!=='Zahlung erhalten' ? ' · '+p.desc : ''}</span>
+          return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;
+            padding:4px 8px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;font-weight:600;color:#4a8fd4">${isPayer?'✓ BEZAHLT':'✓ ERHALTEN'}</span>
+            <span style="font-size:11px;color:var(--text2)">${isPayer?'an '+p.to:'von '+p.from}${p.desc&&p.desc!=='Zahlung erhalten'?' · '+p.desc:''}</span>
             <span style="margin-left:auto;font-weight:600;color:#4a8fd4">€ ${parseFloat(p.amount).toFixed(2)}</span>
-            ${canEdit ? `<button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten" style="flex-shrink:0">✏️</button>` : ''}
+            ${canEdit?`<button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten" style="flex-shrink:0">✏️</button>`:''}
           </div>`;
         }).join('') : '';
-    const myPaymentRows = myT.length > 0
+
+    // ── Noch ausstehende Ausgleichszahlungen ──
+    const myT = transfers.filter(t => t.from === person);
+    const transferHtml = myT.length > 0
       ? myT.map(t => `<div class="payment-row">
           <span style="font-size:11px;color:var(--text2)">zahlt an</span>
           <span style="color:var(--text2)">→</span>
           <span>${t.to}</span>
           <span style="margin-left:auto;font-weight:500">€ ${t.amt.toFixed(2)}</span>
         </div>`).join('')
-      : bal>0.005
+      : bal > 0.005
         ? '<div class="pay-none">empfängt Ausgleich</div>'
-        : '<div class="pay-none">keine Zahlung nötig</div>';
-    const paymentsHtml = directHtml + myPaymentRows;
-
-    const expList = myExpenses.length > 0
-      ? `<div class="exp-breakdown" id="breakdown-${idx}" style="display:none">
-          ${myExpenses.map(e=>`
-            <div class="exp-breakdown-row">
-              <span class="exp-breakdown-desc">${e.desc}</span>
-              <span class="exp-breakdown-amt">€ ${parseFloat(e.amount).toFixed(2)}</span>
-            </div>`).join('')}
-        </div>
-        <button class="exp-toggle-btn" onclick="toggleBreakdown(${idx},this)">
-          ${myExpenses.length} Ausgabe${myExpenses.length!==1?'n':''} anzeigen ▾
-        </button>`
-      : `<div class="pay-none" style="padding-left:0;padding-top:5px">Keine eigenen Ausgaben</div>`;
+        : bal < -0.005
+          ? '<div class="pay-none">ausstehend (bereits verrechnet?)</div>'
+          : '<div class="pay-none">ausgeglichen ✓</div>';
 
     return `<div class="person-block">
       <div class="person-header">
         <div class="avatar" style="background:${p.bg};color:${p.fg}">${person.slice(0,2).toUpperCase()}</div>
         <div>
           <div class="person-name-txt">${person}${person===currentUser?' (du)':''}</div>
-          <div class="person-meta">bezahlt: € ${paid[person].toFixed(2)} · Anteil: € ${owed[person].toFixed(2)}</div>
+          <div class="person-meta">bezahlt: € ${paid[person].toFixed(2)} · schuldet: € ${owed[person].toFixed(2)}</div>
         </div>
         ${chip}
       </div>
-      ${expList}
-      ${paymentsHtml}
+      ${breakdownHtml}
+      ${directHtml}
+      ${transferHtml}
     </div>`;
   }).join('');
 }

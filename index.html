@@ -112,6 +112,30 @@
     .chip-pos { color: var(--green); }
     .chip-neg { color: var(--red); }
     .chip-zero { color: var(--text3); }
+    /* ── Packliste ── */
+    .pack-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .pack-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase;
+      letter-spacing:0.6px; color:var(--text2); padding:0 8px 8px; border-bottom:1px solid var(--border); }
+    .pack-table td { padding:10px 8px; border-bottom:0.5px solid var(--border); vertical-align:middle; }
+    .pack-table tr:last-child td { border-bottom:none; }
+    .pack-done td { opacity:0.45; }
+    .pack-done .pack-item-name { text-decoration:line-through; }
+    .pack-who-badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 7px;
+      border-radius:20px; white-space:nowrap; }
+    .pack-check { width:20px; height:20px; cursor:pointer; accent-color:var(--red); }
+    .pack-add-row { display:flex; gap:8px; margin-top:12px; }
+    .pack-cat-badge { display:inline-block; font-size:10px; padding:1px 6px;
+      border-radius:4px; background:var(--surface2); color:var(--text2); margin-left:4px; }
+    .pack-empty { text-align:center; color:var(--text2); font-size:13px; padding:24px 0; }
+    .pack-filter-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .pack-filter-btn { font-size:11px; padding:4px 10px; border-radius:20px; border:0.5px solid var(--border2);
+      background:var(--surface); color:var(--text2); cursor:pointer; }
+    .pack-filter-btn.active { background:var(--red); color:white; border-color:var(--red); }
+    .pack-progress { height:5px; border-radius:3px; background:var(--border); margin-bottom:14px; overflow:hidden; }
+    .pack-progress-bar { height:100%; background:var(--red); border-radius:3px; transition:width 0.4s; }
+    .pack-delete-btn { background:none; border:none; cursor:pointer; font-size:14px;
+      color:var(--text3); padding:0 2px; opacity:0.6; }
+    .pack-delete-btn:hover { opacity:1; }
     .payment-row { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 0 3px 44px; }
     .pay-none { font-size: 12px; color: var(--text3); padding: 3px 0 0 44px; }
 
@@ -342,6 +366,7 @@
       <button class="nav-btn" onclick="showSec('strecke',this)">Strecke</button>
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
+      <button class="nav-btn" onclick="showSec('packliste',this)">📦 Packliste</button>
     </div>
     <div class="main-scroll">
 
@@ -435,6 +460,51 @@
         </div>
         <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:6px;padding:0 4px">
           Pinch zum Zoomen · Ziehen zum Verschieben · Punkt antippen für Details
+        </div>
+      </div>
+
+      <div class="section" id="sec-packliste">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="card-title" style="margin:0">Was wer mitbringt</div>
+            <div id="pack-stats" style="font-size:11px;color:var(--text2)"></div>
+          </div>
+          <div class="pack-progress"><div class="pack-progress-bar" id="pack-bar" style="width:0%"></div></div>
+          <div class="pack-filter-row" id="pack-filters">
+            <button class="pack-filter-btn active" onclick="filterPack('alle',this)">Alle</button>
+            <button class="pack-filter-btn" onclick="filterPack('offen',this)">Offen</button>
+            <button class="pack-filter-btn" onclick="filterPack('erledigt',this)">Erledigt</button>
+            <button class="pack-filter-btn" onclick="filterPack('ich',this)">Meine</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="pack-table">
+              <thead><tr>
+                <th style="width:28px"></th>
+                <th>Was</th>
+                <th>Wer</th>
+                <th>Kategorie</th>
+                <th style="width:30px"></th>
+              </tr></thead>
+              <tbody id="pack-tbody"></tbody>
+            </table>
+          </div>
+          <div id="pack-empty" class="pack-empty" style="display:none">Noch nichts eingetragen ✨</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Eintrag hinzufügen</div>
+          <div class="pack-add-row">
+            <input type="text" id="pack-item" placeholder="Was? z.B. Campingkocher" style="flex:1">
+            <select id="pack-cat" style="flex:0 0 120px;width:auto">
+              <option value="Essen & Trinken">🍺 Essen</option>
+              <option value="Ausrüstung">⛺ Ausrüstung</option>
+              <option value="Fahrzeug">🚗 Fahrzeug</option>
+              <option value="Sonstiges">📦 Sonstiges</option>
+            </select>
+          </div>
+          <div class="pack-add-row" style="margin-top:8px">
+            <select id="pack-who" style="flex:1;width:auto"></select>
+            <button class="btn-primary" onclick="addPackItem()" style="flex:0 0 auto;padding:0 18px">+ Hinzufügen</button>
+          </div>
         </div>
       </div>
 
@@ -660,6 +730,7 @@ function subscribeToGroup() {
     groupSnapshot = snap.val();
     rebuildBuyerSelect();
     renderExpenses();
+    renderPackliste();
   });
 }
 
@@ -923,6 +994,111 @@ window.toggleBreakdown = function(idx, btn) {
     : `${count} Ausgabe${count!=='1'?'n':''} ausblenden ▴`;
 };
 
+// ═══════════════════════════════════════════
+// PACKLISTE
+// ═══════════════════════════════════════════
+let packFilter = 'alle';
+const PACK_COLORS = [
+  {bg:'#1a1a2e',fg:'#fff'},{bg:'#2d5a27',fg:'#fff'},{bg:'#8b1a1a',fg:'#fff'},
+  {bg:'#1a3a5c',fg:'#fff'},{bg:'#5c3a1a',fg:'#fff'},{bg:'#3a1a5c',fg:'#fff'},
+];
+
+function getMemberColor(name, members) {
+  const idx = members.indexOf(name);
+  return PACK_COLORS[idx >= 0 ? idx % PACK_COLORS.length : 0];
+}
+
+function renderPackliste() {
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const items   = Object.values(groupSnapshot?.packliste || {})
+    .sort((a,b) => (a.ts||0)-(b.ts||0));
+
+  // update who-dropdown
+  const whoSel = document.getElementById('pack-who');
+  if (whoSel) whoSel.innerHTML = members.map(m =>
+    `<option value="${m}"${m===currentUser?' selected':''}>${m}</option>`).join('');
+
+  const done  = items.filter(i => i.done).length;
+  const total = items.length;
+  const pct   = total > 0 ? Math.round(done/total*100) : 0;
+
+  const statEl = document.getElementById('pack-stats');
+  if (statEl) statEl.textContent = total > 0 ? `${done} / ${total} erledigt (${pct}%)` : '';
+  const bar = document.getElementById('pack-bar');
+  if (bar) bar.style.width = pct + '%';
+
+  // apply filter
+  let filtered = items;
+  if (packFilter === 'offen')    filtered = items.filter(i => !i.done);
+  if (packFilter === 'erledigt') filtered = items.filter(i => i.done);
+  if (packFilter === 'ich')      filtered = items.filter(i => i.who === currentUser);
+
+  const tbody  = document.getElementById('pack-tbody');
+  const emptyEl = document.getElementById('pack-empty');
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = '';
+  } else {
+    if (emptyEl) emptyEl.style.display = 'none';
+    tbody.innerHTML = filtered.map(item => {
+      const col = getMemberColor(item.who, members);
+      const canDelete = item.who === currentUser;
+      return `<tr class="${item.done ? 'pack-done' : ''}" id="packrow-${item.id}">
+        <td>
+          <input type="checkbox" class="pack-check" ${item.done ? 'checked' : ''}
+            onchange="togglePackItem('${item.id}', this.checked)">
+        </td>
+        <td><span class="pack-item-name">${item.name}</span></td>
+        <td>
+          <span class="pack-who-badge" style="background:${col.bg};color:${col.fg}">
+            ${item.who}
+          </span>
+        </td>
+        <td><span class="pack-cat-badge">${item.cat || 'Sonstiges'}</span></td>
+        <td>
+          ${canDelete
+            ? `<button class="pack-delete-btn" onclick="deletePackItem('${item.id}')" title="Löschen">🗑</button>`
+            : ''}
+        </td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+window.filterPack = function(f, btn) {
+  packFilter = f;
+  document.querySelectorAll('.pack-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderPackliste();
+};
+
+window.addPackItem = async function() {
+  const name = document.getElementById('pack-item').value.trim();
+  const who  = document.getElementById('pack-who').value;
+  const cat  = document.getElementById('pack-cat').value;
+  if (!name) { document.getElementById('pack-item').focus(); return; }
+  try {
+    const newRef = push(ref(db, 'groups/' + currentGroupKey + '/packliste'));
+    await set(newRef, { id: newRef.key, name, who, cat, done: false, ts: Date.now() });
+    document.getElementById('pack-item').value = '';
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+window.togglePackItem = async function(id, checked) {
+  try {
+    await set(ref(db, 'groups/' + currentGroupKey + '/packliste/' + id + '/done'), checked);
+  } catch(e) { console.warn(e); }
+};
+
+window.deletePackItem = async function(id) {
+  if (!confirm('Eintrag löschen?')) return;
+  try {
+    await remove(ref(db, 'groups/' + currentGroupKey + '/packliste/' + id));
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
 window.showSec = function(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -932,6 +1108,7 @@ window.showSec = function(id, btn) {
   if (id === 'wetter') buildWeather();
   if (id === 'quiz') resetQuizView();
   if (id === 'strecke') { buildStreckeSVG(); setTimeout(initMapGestures, 100); }
+  if (id === 'packliste') renderPackliste();
 };
 
 // ── WMO weather code → emoji + label ──

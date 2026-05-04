@@ -148,25 +148,6 @@
     .pack-delete-btn { background:none; border:none; cursor:pointer; font-size:14px;
       color:var(--text3); padding:0 2px; opacity:0.6; }
     .pack-delete-btn:hover { opacity:1; }
-    /* Tipp-Spiel */
-    .tipp-card { background:var(--surface);border-radius:var(--r-lg);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s }
-    .tipp-card:hover { border-color:var(--red) }
-    .tipp-card.selected { border-color:var(--red);background:rgba(226,75,74,0.08) }
-    .tipp-podium { display:flex;gap:8px;margin-bottom:14px }
-    .tipp-podium-slot { flex:1;background:var(--surface2);border-radius:10px;padding:10px 8px;text-align:center;border:0.5px solid var(--border) }
-    .tipp-result-bar { height:6px;border-radius:3px;background:var(--border);margin-top:8px;overflow:hidden }
-    .tipp-result-fill { height:100%;background:var(--red);border-radius:3px;transition:width 0.6s }
-    /* Chat */
-    .chat-msg { padding:8px 12px;margin-bottom:6px;max-width:82%;word-break:break-word;line-height:1.45 }
-    .chat-msg.mine { margin-left:auto;background:var(--red);color:white;border-radius:16px 16px 4px 16px }
-    .chat-msg.theirs { background:var(--surface);border:0.5px solid var(--border);border-radius:16px 16px 16px 4px }
-    .chat-msg-meta { font-size:10px;opacity:0.65;margin-bottom:2px }
-    .chat-scroll { flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column }
-    .chat-input-row { display:flex;gap:8px;padding:10px 14px;border-top:0.5px solid var(--border);background:var(--surface);flex-shrink:0 }
-    /* Camping */
-    .camp-card { background:var(--surface);border-radius:var(--r-lg);border:0.5px solid var(--border);overflow:hidden;margin-bottom:10px }
-    .camp-card-header { padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer }
-    .camp-detail { display:none;padding:0 14px 12px;font-size:12px;color:var(--text2);line-height:1.7 }
     /* Splitten-Checkboxen */
     .split-label { display:inline-flex; align-items:center; gap:5px; font-size:12px;
       color:var(--text2); cursor:pointer; padding:3px 8px; border-radius:20px;
@@ -412,9 +393,6 @@
       <button class="nav-btn" onclick="showSec('shuttle',this)">🚌 Shuttle</button>
       <button class="nav-btn" onclick="showSec('teams',this)">🏎 Teams</button>
       <button class="nav-btn" onclick="showSec('eventguide',this)">📅 Zeitplan</button>
-      <button class="nav-btn" onclick="showSec('tipp',this)">🎯 Tipp</button>
-      <button class="nav-btn" onclick="showSec('camping',this)">⛺ Camping</button>
-      <button class="nav-btn" onclick="showSec('chat',this)">💬 Chat</button>
     </div>
     <div class="main-scroll">
 
@@ -660,155 +638,6 @@
         <div style="background:rgba(74,143,212,0.1);border:0.5px solid rgba(74,143,212,0.3);border-radius:var(--r-lg);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.7">
           🔄 <strong style="color:var(--text)">Umstieg am Scharfer Kopf</strong> – hier kann zwischen Route 1 und Route 2 gewechselt werden.<br>
           🏎 <strong style="color:var(--text)">Falken Drift Show</strong> – Stopp am Fahrsicherheitszentrum II nur freitags.
-        </div>
-      </div>
-
-      <div class="section" id="sec-tipp">
-        <div class="race-header" style="margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:28px">🎯</span>
-            <div>
-              <div style="font-size:15px;font-weight:700;margin-bottom:2px">Tipp-Spiel</div>
-              <div style="font-size:11px;color:#aaa">Wer gewinnt das 24h-Rennen 2026?</div>
-            </div>
-          </div>
-        </div>
-        <div id="tipp-content"></div>
-      </div>
-
-      <div class="section" id="sec-camping">
-        <div class="race-header" style="margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:28px">⛺</span>
-            <div>
-              <div style="font-size:15px;font-weight:700;margin-bottom:2px">Camping & Anreise</div>
-              <div style="font-size:11px;color:#aaa">Tipps rund um den Nürburgring</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:rgba(226,75,74,0.1);border:0.5px solid rgba(226,75,74,0.3);border-radius:var(--r-lg);padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-          🚗 <strong style="color:var(--text)">Tipp:</strong> Früh anreisen! Bei Verstappens Debüt werden Rekordbesucherzahlen erwartet. ADAC warnt vor massiven Staus ab Freitag.
-        </div>
-
-        <!-- Unser Platz: C3 / Goodyear-Kehre -->
-        <div class="camp-card" style="border-color:rgba(226,75,74,0.5);background:rgba(226,75,74,0.05)">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">⭐</span>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:700">Bereich C3 – Goodyear-Kehre <span style="font-size:10px;background:var(--red);color:white;padding:1px 6px;border-radius:8px;margin-left:4px">Unser Platz</span></div>
-              <div style="font-size:11px;color:var(--text2)">Früher: Dunlop-Kehre · Grand-Prix-Kurs</div>
-            </div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">Lage:</strong> Direkt an der Goodyear-Kehre (ehem. Dunlop-Kehre) am Grand-Prix-Kurs – einer der besten Spots um das Rennen hautnah zu erleben!<br><br>
-            <strong style="color:var(--text)">Family &amp; Friends Camping (C3):</strong> Reservierbare 10×5m Parzellen – wie ein Konzert-Saalplan, du siehst genau deinen Platz. Strom inklusive, Duschcamp fußläufig erreichbar, Nachtruhe ab 22 Uhr.<br><br>
-            <strong style="color:var(--text)">Bedarfscampingzonen:</strong> Rund um den GP-Kurs gibt es außerdem die freien Flächen A5a, C1, C2 und C3 – kein Vorverkauf, Zahlung direkt bei Einfahrt.<br><br>
-            <strong style="color:var(--text)">2026 neu:</strong> Erstmals flächendeckend Zahlung mit EC-Karte möglich! 💳<br><br>
-            <strong style="color:var(--text)">Freigabe:</strong> Bereits ab Montag vor dem Rennen (11. Mai) befahrbar.<br><br>
-            🔗 Reservierung Family &amp; Friends: <span style="color:var(--red)">nuerburgring.de/camping</span>
-          </div>
-        </div>
-
-        <div class="camp-card">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">🅿️</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:700">Weitere Campingplätze</div><div style="font-size:11px;color:var(--text2)">Alle Optionen rund um den Ring</div></div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">Brünnchen</strong> – Direkt an der Nordschleife, spektakuläre Streckenaction, legendäre Atmosphäre. Kaum Schlaf, aber unvergesslich! 🔥<br><br>
-            <strong style="color:var(--text)">Pflanzgarten</strong> – Ebenfalls Nordschleife, günstigere Alternative zu Brünnchen. Sehr beliebt bei Dauercampern.<br><br>
-            <strong style="color:var(--text)">Tiergarten</strong> – Ruhiger, großes Gelände, gute Infrastruktur. Ideal für Familien oder wer etwas Abstand vom Trubel will.<br><br>
-            <strong style="color:var(--text)">Karussell / Wippermann</strong> – Nordschleife pur. Achtung: Teils im Vogelschutzgebiet, besondere Rücksicht erforderlich.<br><br>
-            <strong style="color:var(--text)">Grand-Prix-Infield</strong> – Teuerste Option, direkte Nähe zu Boxengasse und Fahrerlager.<br><br>
-            📋 Alle Bereiche außer C3 Family&amp;Friends: kein Vorverkauf, Zahlung direkt bei Einfahrt. Ab Montag 11. Mai befahrbar.
-          </div>
-        </div>
-
-        <div class="camp-card">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">🚗</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:700">Anreise & Stau-Tipps</div><div style="font-size:11px;color:var(--text2)">So kommt ihr entspannt an</div></div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">Beste Anreisezeit:</strong> Mittwoch oder Donnerstagmorgen früh – Freitag/Samstag extreme Staus erwartet.<br><br>
-            <strong style="color:var(--text)">A61 Ausfahrt Nürburg</strong> – Hauptzufahrt, am staustärksten. Alternative: A48 → B257.<br><br>
-            <strong style="color:var(--text)">Navigationstipp:</strong> „Nürburgring" als Ziel eingeben, nicht einzelne Orte. Frühzeitig vom Navi abweichen wenn Stau gemeldet wird.<br><br>
-            <strong style="color:var(--text)">Shuttle-Alternative:</strong> Ab Adenau Mitte fährt der Fan-Shuttle direkt zum Ring → kein Parkplatzstress!
-          </div>
-        </div>
-
-        <div class="camp-card">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">📦</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:700">Was mitnehmen?</div><div style="font-size:11px;color:var(--text2)">Checkliste für das Wochenende</div></div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">Pflicht:</strong> Regenkleidung (Eifelwetter!), Sonnencreme, Campingstuhl, Kopfhörer/Ohrstöpsel, Powerbank, Bargeld.<br><br>
-            <strong style="color:var(--text)">Empfohlen:</strong> Scanner/App für Funkkommunikation der Teams, Fernglas, Wärmedecke für die Nacht, Taschenlampe.<br><br>
-            <strong style="color:var(--text)">Essen & Trinken:</strong> Am Ring teuer – Vorräte mitbringen. Alkohol auf Campingplätzen erlaubt, im Fahrerlager nicht.<br><br>
-            <strong style="color:var(--text)">Verboten:</strong> Drohnen, Laserpointer, Flaschen aus Glas im Bereich der Strecke.
-          </div>
-        </div>
-
-        <div class="camp-card">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">📡</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:700">Live-Timing & Stream</div><div style="font-size:11px;color:var(--text2)">Das Rennen live verfolgen</div></div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">Offizielles Live-Timing:</strong> <span style="color:var(--red)">24h-rennen.de/live</span> – kostenlos, Echtzeit-Standings, alle Klassen.<br><br>
-            <strong style="color:var(--text)">TV:</strong> NITRO überträgt alle 24 Stunden live im Free-TV. RTL+ für alle Qualifyings.<br><br>
-            <strong style="color:var(--text)">YouTube:</strong> Offizieller 24h-Kanal streamt das komplette Rennen kostenlos auf Deutsch & Englisch.<br><br>
-            <strong style="color:var(--text)">Red Bull TV:</strong> Verstappen-Fans aufgepasst – Red Bull überträgt das Rennen auf ihrem YouTube-Kanal und RedBullTV.<br><br>
-            <strong style="color:var(--text)">App:</strong> „Nürburgring 24h" App für iOS & Android mit Live-Timing, Karte und Notifications.
-          </div>
-        </div>
-
-        <div class="camp-card">
-          <div class="camp-card-header" onclick="toggleCamp(this)">
-            <span style="font-size:22px">🍺</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:700">ring°boulevard & Verpflegung</div><div style="font-size:11px;color:var(--text2)">Essen, Trinken, Shopping</div></div>
-            <span style="color:var(--text2)">▸</span>
-          </div>
-          <div class="camp-detail">
-            <strong style="color:var(--text)">ring°boulevard</strong> – Das Einkaufs- und Gastromeile direkt am Ring. Do–Sa 09:00–22:00, So bis 17:00 Uhr.<br><br>
-            <strong style="color:var(--text)">Fan-Meile</strong> – Merchandise, Autogramme, Hersteller-Stände. Immer gut für Fotos und Erinnerungen.<br><br>
-            <strong style="color:var(--text)">RAVENOL Riesenrad</strong> – Überblick über das gesamte Gelände. Do–Sa in Betrieb, traumhafter Blick bei Nacht!<br><br>
-            <strong style="color:var(--text)">Preis-Tipp:</strong> Supermarkt in Adenau (ca. 8 km) für Vorräte. Am Ring alles mind. 50% teurer.
-          </div>
-        </div>
-      </div>
-
-      <div class="section" id="sec-chat">
-        <div style="display:flex;flex-direction:column;height:calc(100vh - 160px)">
-          <div style="padding:12px 14px 8px;flex-shrink:0">
-            <div style="font-size:15px;font-weight:700;margin-bottom:2px">💬 Gruppen-Chat</div>
-            <div style="font-size:11px;color:var(--text2)" id="chat-subtitle">Kurze Nachrichten an die Gruppe</div>
-            <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:8px 12px;margin-top:8px;font-size:11px;color:var(--text2);line-height:1.6">
-              💡 <strong style="color:var(--text)">So funktioniert der Chat:</strong>
-              Einfach Nachricht eingeben und auf <strong style="color:var(--text)">Senden</strong> tippen – oder <strong style="color:var(--text)">Enter</strong> drücken.
-              Deine Nachrichten erscheinen rechts in <span style="color:var(--red)">Rot</span>, die der anderen links in Grau –
-              genau wie bei WhatsApp. Der Chat wird in Echtzeit synchronisiert,
-              alle Gruppenmitglieder sehen neue Nachrichten sofort.
-            </div>
-          </div>
-          <div class="chat-scroll" id="chat-messages">
-            <div style="text-align:center;color:var(--text2);font-size:12px;padding:20px 0">Noch keine Nachrichten ✨</div>
-          </div>
-          <div class="chat-input-row">
-            <input type="text" id="chat-input" placeholder="Nachricht…" maxlength="300"
-              style="flex:1;border-radius:20px;border:0.5px solid var(--border2);background:var(--surface2);
-                color:var(--text);padding:8px 14px;font-size:13px;outline:none"
-              onkeydown="if(event.key==='Enter')sendChat()">
-            <button class="btn-primary" onclick="sendChat()"
-              style="border-radius:20px;padding:0 16px;flex-shrink:0">Senden</button>
-          </div>
         </div>
       </div>
 
@@ -1257,7 +1086,6 @@ function subscribeToGroup() {
     rebuildBuyerSelect();
     renderExpenses();
     renderPackliste();
-    renderTipp();
   });
 }
 
@@ -2164,183 +1992,6 @@ window.filterTeamsByClass = function(cls, btn) {
 
 // filterTeamsByClass defined above
 
-// ═══════════════════════════════════════════
-// CAMPING
-// ═══════════════════════════════════════════
-window.toggleCamp = function(header) {
-  const detail = header.nextElementSibling;
-  const arrow = header.querySelector('span:last-child');
-  const open = detail.style.display === 'block';
-  detail.style.display = open ? 'none' : 'block';
-  if (arrow) arrow.textContent = open ? '▸' : '▾';
-};
-
-// ═══════════════════════════════════════════
-// CHAT
-// ═══════════════════════════════════════════
-let chatUnsubscribe = null;
-
-function initChat() {
-  const subtitle = document.getElementById('chat-subtitle');
-  if (!currentGroupKey) return;
-  if (subtitle) subtitle.textContent = currentGroupKey + ' · Echtzeit';
-  if (chatUnsubscribe) return; // already listening
-  chatUnsubscribe = onValue(ref(db, 'groups/' + currentGroupKey + '/chat'), snap => {
-    const box = document.getElementById('chat-messages');
-    if (!box) return;
-    if (!snap.exists()) {
-      box.innerHTML = '<div style="text-align:center;color:var(--text2);font-size:12px;padding:20px 0">Noch keine Nachrichten ✨</div>';
-      return;
-    }
-    const msgs = Object.values(snap.val()).sort((a,b) => (a.ts||0)-(b.ts||0));
-    box.innerHTML = msgs.map(m => {
-      const mine = m.who === currentUser;
-      const time = new Date(m.ts).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'});
-      return `<div style="display:flex;flex-direction:column;margin-bottom:6px;align-items:${mine?'flex-end':'flex-start'}">
-        <div style="font-size:10px;color:var(--text2);margin-bottom:2px;padding:0 4px">${mine?'Du':m.who} · ${time}</div>
-        <div class="chat-msg ${mine?'mine':'theirs'}">${m.text}</div>
-      </div>`;
-    }).join('');
-    box.scrollTop = box.scrollHeight;
-  });
-}
-
-window.sendChat = async function() {
-  const inp = document.getElementById('chat-input');
-  const text = inp.value.trim();
-  if (!text || !currentGroupKey || !currentUser) return;
-  inp.value = '';
-  try {
-    await push(ref(db, 'groups/' + currentGroupKey + '/chat'), {
-      who: currentUser, text, ts: Date.now()
-    });
-  } catch(e) { alert('Fehler: ' + e.message); }
-};
-
-// ═══════════════════════════════════════════
-// TIPP-SPIEL
-// ═══════════════════════════════════════════
-const TIPP_FAVORITEN = [
-  { nr:'3',  team:'Verstappen Racing', car:'Mercedes-AMG GT3', emoji:'🔵' },
-  { nr:'911',team:'Manthey EMA (Grello)', car:'Porsche 911 GT3 R', emoji:'🟢' },
-  { nr:'98', team:'ROWE Racing', car:'BMW M4 GT3 EVO', emoji:'🔵' },
-  { nr:'16', team:'Scherer Sport PHX', car:'Audi R8 LMS GT3', emoji:'🔴' },
-  { nr:'81', team:'BMW M Motorsport', car:'BMW M3 Touring GT3', emoji:'🔵' },
-  { nr:'77', team:'Schubert Motorsport', car:'BMW M4 GT3 EVO', emoji:'🔵' },
-  { nr:'65', team:'HRT Ford Racing', car:'Ford Mustang GT3', emoji:'🔵' },
-  { nr:'84', team:'Red Bull Team ABT', car:'Lamborghini Huracán GT3', emoji:'🟡' },
-  { nr:'69', team:'Dörr Motorsport', car:'McLaren 720S GT3', emoji:'🟠' },
-  { nr:'44', team:'Falken Motorsports', car:'Porsche 911 GT3 R', emoji:'🟡' },
-  { nr:'47', team:'KCMG', car:'Mercedes-AMG GT3', emoji:'🔵' },
-  { nr:'62', team:'HWA AG (Evo R)', car:'HWA Evo R', emoji:'⚪' },
-];
-
-function renderTipp() {
-  const container = document.getElementById('tipp-content');
-  if (!container || !currentGroupKey) return;
-
-  const myTipp = groupSnapshot?.tipps?.[currentUser];
-  const allTipps = groupSnapshot?.tipps || {};
-  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
-
-  if (myTipp) {
-    // Show results view
-    const fav = TIPP_FAVORITEN.find(f => f.nr === myTipp) || {nr:myTipp,team:myTipp,car:'',emoji:'🏎'};
-    // Count votes per team
-    const votes = {};
-    TIPP_FAVORITEN.forEach(f => votes[f.nr] = 0);
-    Object.values(allTipps).forEach(nr => { votes[nr] = (votes[nr]||0)+1; });
-    const total = Object.keys(allTipps).length || 1;
-    const sorted = TIPP_FAVORITEN.slice().sort((a,b)=>(votes[b.nr]||0)-(votes[a.nr]||0));
-
-    // Who tipped what
-    const tippedBy = {};
-    Object.entries(allTipps).forEach(([who,nr]) => {
-      if (!tippedBy[nr]) tippedBy[nr] = [];
-      tippedBy[nr].push(who);
-    });
-
-    container.innerHTML = `
-      <div class="card" style="margin-bottom:12px;text-align:center;padding:16px">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px">Dein Tipp</div>
-        <div style="font-size:28px;margin-bottom:4px">${fav.emoji}</div>
-        <div style="font-size:16px;font-weight:700">#${fav.nr} ${fav.team}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${fav.car}</div>
-        <button onclick="changeTipp()" style="margin-top:12px;font-size:11px;background:none;
-          border:0.5px solid var(--border2);color:var(--text2);padding:4px 12px;border-radius:20px;cursor:pointer">
-          ✏️ Tipp ändern
-        </button>
-      </div>
-      <div class="card">
-        <div class="card-title">Gruppe tippt auf…</div>
-        ${sorted.filter(f=>(votes[f.nr]||0)>0 || f.nr===myTipp).map(f => {
-          const pct = Math.round(((votes[f.nr]||0)/total)*100);
-          const who = tippedBy[f.nr] || [];
-          return `<div style="margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-size:16px">${f.emoji}</span>
-              <span style="font-size:12px;font-weight:600">#${f.nr} ${f.team}</span>
-              <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--red)">${pct}%</span>
-            </div>
-            <div class="tipp-result-bar"><div class="tipp-result-fill" style="width:${pct}%"></div></div>
-            ${who.length>0?`<div style="font-size:10px;color:var(--text2);margin-top:3px">➜ ${who.join(', ')}</div>`:''}
-          </div>`;
-        }).join('')}
-        <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px">${Object.keys(allTipps).length} von ${members.length} haben getippt</div>
-      </div>`;
-  } else {
-    // Show selection view
-    container.innerHTML = `
-      <div style="background:rgba(226,75,74,0.1);border:0.5px solid rgba(226,75,74,0.3);border-radius:var(--r-lg);
-        padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-        🏆 Wer gewinnt das <strong style="color:var(--text)">54. 24h-Rennen am Nürburgring 2026</strong>?
-        Tippe deinen Favoriten – du siehst die Tipps der anderen erst nach deiner Auswahl!
-      </div>
-      <div id="tipp-list">
-        ${TIPP_FAVORITEN.map(f => `
-          <div class="tipp-card" onclick="submitTipp('${f.nr}')">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="font-size:24px;width:36px;text-align:center">${f.emoji}</div>
-              <div style="flex:1">
-                <div style="font-size:13px;font-weight:700">#${f.nr} ${f.team}</div>
-                <div style="font-size:11px;color:var(--text2);margin-top:1px">${f.car}</div>
-              </div>
-              <div style="font-size:18px;color:var(--text2)">›</div>
-            </div>
-          </div>`).join('')}
-        <div class="tipp-card" onclick="showCustomTipp()" style="opacity:0.7">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="font-size:24px;width:36px;text-align:center">🏎</div>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:600">Anderes Team…</div>
-              <div style="font-size:11px;color:var(--text2)">Alle 124 Teams auswählbar</div>
-            </div>
-            <div style="font-size:18px;color:var(--text2)">›</div>
-          </div>
-        </div>
-      </div>`;
-  }
-}
-
-window.submitTipp = async function(nr) {
-  if (!currentGroupKey || !currentUser) return;
-  try {
-    await set(ref(db, 'groups/' + currentGroupKey + '/tipps/' + currentUser), nr);
-    renderTipp();
-  } catch(e) { alert('Fehler: ' + e.message); }
-};
-
-window.changeTipp = function() {
-  if (confirm('Tipp wirklich ändern?')) {
-    remove(ref(db, 'groups/' + currentGroupKey + '/tipps/' + currentUser)).then(() => renderTipp());
-  }
-};
-
-window.showCustomTipp = function() {
-  const nr = prompt('Startnummer eingeben (z.B. 44 für Falken Porsche):');
-  if (nr && nr.trim()) submitTipp(nr.trim());
-};
-
 window.showSec = function(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2351,8 +2002,6 @@ window.showSec = function(id, btn) {
   if (id === 'quiz') resetQuizView();
   if (id === 'strecke') { buildStreckeSVG(); setTimeout(initMapGestures, 100); }
   if (id === 'packliste') renderPackliste();
-  if (id === 'chat') initChat();
-  if (id === 'tipp') renderTipp();
 };
 
 // ── WMO weather code → emoji + label ──

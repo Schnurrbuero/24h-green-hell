@@ -426,12 +426,13 @@
 
         <div class="card">
           <div class="card-title">Zahlung erhalten</div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Geld von jemandem bekommen? Hier eintragen – wird nur bei dieser Person als Zahlung verrechnet.</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Wähle Person und Schuld aus – Betrag wird vorausgefüllt, kann aber angepasst werden.</div>
           <div class="form-row">
-            <select id="pay-from" style="width:auto;flex:1"></select>
-            <input type="number" id="pay-amt" placeholder="Betrag €" step="0.01" min="0.01" style="width:auto;flex:0 0 110px">
+            <select id="pay-from" onchange="updateDebtSelector()" style="width:auto;flex:0 0 130px"></select>
+            <select id="pay-debt" onchange="updatePayAmt()" style="width:auto;flex:1"></select>
           </div>
           <div class="form-row" style="margin-top:8px">
+            <input type="number" id="pay-amt" placeholder="Betrag €" step="0.01" min="0.01" style="width:auto;flex:0 0 110px">
             <input type="text" id="pay-desc" placeholder="Notiz (optional)" style="flex:1">
             <button class="btn-primary" onclick="addPaymentReceived()" style="flex:0 0 auto;padding:0 16px">Eintragen</button>
           </div>
@@ -621,7 +622,8 @@
   <div class="modal-box">
     <div class="modal-title">Zahlung bearbeiten</div>
     <div class="modal-row">
-      <select id="pem-from" style="flex:1;width:auto"></select>
+      <select id="pem-from" onchange="updatePemDebtSelector()" style="flex:0 0 130px;width:auto"></select>
+      <select id="pem-debt" onchange="updatePemAmt()" style="flex:1;width:auto"></select>
     </div>
     <div class="modal-row" style="margin-top:8px">
       <input type="number" id="pem-amt" placeholder="Betrag €" step="0.01" min="0.01" style="flex:0 0 130px;width:auto">
@@ -858,8 +860,12 @@ function rebuildBuyerSelect() {
   sel.innerHTML = members.map(m => `<option${m===currentUser||m===prev?' selected':''}>${m}</option>`).join('');
   // Also refresh pay-from
   const payFrom = document.getElementById('pay-from');
-  if (payFrom) payFrom.innerHTML = members.filter(m => m !== currentUser)
-    .map(m => `<option value="${m}">${m}</option>`).join('');
+  if (payFrom) {
+    const prevFrom = payFrom.value;
+    payFrom.innerHTML = members.filter(m => m !== currentUser)
+      .map(m => `<option value="${m}"${m===prevFrom?' selected':''}>${m}</option>`).join('');
+    if (typeof updateDebtSelector === 'function') updateDebtSelector();
+  }
   // Build split checkboxes (all checked by default)
   const splitRow = document.getElementById('split-checks');
   if (splitRow) {
@@ -914,6 +920,11 @@ function renderExpenses() {
 }
 
 // ── Zahlungsliste rendern ──
+function getExpLabel(expId) {
+  const expObj = groupSnapshot?.expenses || {};
+  return expObj[expId] ? expObj[expId].desc : '';
+}
+
 function renderPayList() {
   const el = document.getElementById('pay-list');
   if (!el) return;
@@ -926,7 +937,7 @@ function renderPayList() {
     mine.map(p => `
       <div class="expense-item" style="align-items:center">
         <span class="exp-who">${p.from}</span>
-        <span class="exp-desc">${p.desc || 'Zahlung erhalten'}</span>
+        <span class="exp-desc">${p.desc || 'Zahlung erhalten'}${p.expId && p.expId !== '__general__' ? ` <span style="font-size:10px;color:var(--text2)">(${getExpLabel(p.expId)})</span>` : ''}</span>
         <span class="exp-amount">€ ${parseFloat(p.amount).toFixed(2)}</span>
         <button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten">✏️</button>
       </div>`).join('');
@@ -936,7 +947,6 @@ let editingPayId = null;
 
 window.openPayEditModal = function(id) {
   const payments = groupSnapshot?.payments || {};
-  // Support both old records (no id field) and new ones
   const p = payments[id] ? {...payments[id], id} : null;
   if (!p) return;
   editingPayId = id;
@@ -944,6 +954,14 @@ window.openPayEditModal = function(id) {
   const fromSel = document.getElementById('pem-from');
   fromSel.innerHTML = members.filter(m => m !== currentUser)
     .map(m => `<option value="${m}"${m===p.from?' selected':''}>${m}</option>`).join('');
+  // Populate debt selector for this person (debts + current selection)
+  updatePemDebtSelector();
+  // Override selected option to match saved expId
+  const debtSel = document.getElementById('pem-debt');
+  const curExpId = p.expId || '__general__';
+  Array.from(debtSel.options).forEach(opt => {
+    opt.selected = opt.value === curExpId;
+  });
   document.getElementById('pem-amt').value  = parseFloat(p.amount).toFixed(2);
   document.getElementById('pem-desc').value = p.desc || '';
   document.getElementById('pay-edit-modal').style.display = 'flex';
@@ -962,8 +980,9 @@ window.savePayEdit = async function() {
   const desc = document.getElementById('pem-desc').value.trim() || 'Zahlung erhalten';
   if (!from || isNaN(amt) || amt <= 0) { alert('Bitte Person und Betrag angeben.'); return; }
   try {
+    const expId = document.getElementById('pem-debt').value || '__general__';
     await set(ref(db, 'groups/' + currentGroupKey + '/payments/' + editingPayId), {
-      id: editingPayId, from, to: currentUser, amount: amt, desc, ts: Date.now()
+      id: editingPayId, from, to: currentUser, amount: amt, desc, expId, ts: Date.now()
     });
     document.getElementById('pay-edit-modal').style.display = 'none';
     editingPayId = null;
@@ -980,6 +999,94 @@ window.confirmDeletePayment = async function() {
   } catch(e) { alert('Fehler: ' + e.message); }
 };
 
+// ── Hilfsfunktion: offene Schulden einer Person gegenüber currentUser berechnen ──
+function getDebtsForPerson(fromPerson) {
+  // Returns list of {label, amount, expId} for what fromPerson owes currentUser
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const expenses = Object.entries(groupSnapshot?.expenses || {})
+    .map(([id,e]) => ({id,...e}));
+  const allPayments = Object.entries(groupSnapshot?.payments || {})
+    .map(([k,p]) => ({...p, id: p.id||k}));
+
+  // What does fromPerson owe currentUser per expense?
+  const debts = [];
+
+  // Per-expense debts: expenses paid by currentUser, where fromPerson is a splitter
+  expenses.forEach(e => {
+    const splitters = (e.splitWith && e.splitWith.length > 0)
+      ? e.splitWith.filter(m => members.includes(m))
+      : members;
+    const isPaidByMe = e.who === currentUser;
+    const fromOwes = splitters.includes(fromPerson);
+    if (isPaidByMe && fromOwes && fromPerson !== currentUser) {
+      const share = parseFloat(e.amount) / splitters.length;
+      debts.push({ label: e.desc, amount: share, expId: e.id, type: 'expense' });
+    }
+  });
+
+  // Also: fromPerson owes Sonja, but Sonja owes me → indirect (skip for now, show total)
+  // Calculate already paid towards each expense
+  const alreadyPaid = {};
+  allPayments.forEach(p => {
+    if (p.from === fromPerson && p.to === currentUser) {
+      const key = p.expId || '__general__';
+      alreadyPaid[key] = (alreadyPaid[key] || 0) + parseFloat(p.amount);
+    }
+  });
+
+  // Subtract already paid amounts from debts
+  return debts.map(d => {
+    const paid = alreadyPaid[d.expId] || 0;
+    const remaining = +(d.amount - paid).toFixed(2);
+    return {...d, remaining, fullyPaid: remaining <= 0.005};
+  }).filter(d => !d.fullyPaid);
+}
+
+// Update debt dropdown when person changes
+window.updateDebtSelector = function() {
+  const from = document.getElementById('pay-from').value;
+  const debtSel = document.getElementById('pay-debt');
+  const debts = getDebtsForPerson(from);
+  debtSel.innerHTML =
+    '<option value="">— Schuld auswählen —</option>' +
+    debts.map(d =>
+      `<option value="${d.expId}" data-amt="${d.remaining}">${d.label} (€ ${d.remaining.toFixed(2)})</option>`
+    ).join('') +
+    `<option value="__general__" data-amt="">Sonstiges / allgemein</option>`;
+  updatePayAmt();
+};
+
+window.updatePayAmt = function() {
+  const debtSel = document.getElementById('pay-debt');
+  const opt = debtSel.selectedOptions[0];
+  const amt = opt ? opt.dataset.amt : '';
+  const amtIn = document.getElementById('pay-amt');
+  if (amt) { amtIn.value = amt; } else { amtIn.value = ''; }
+};
+
+// Same for edit modal
+window.updatePemDebtSelector = function() {
+  const from = document.getElementById('pem-from').value;
+  const debtSel = document.getElementById('pem-debt');
+  const debts = getDebtsForPerson(from);
+  const p = editingPayId ? (groupSnapshot?.payments||{})[editingPayId] : null;
+  const curExpId = p?.expId || '';
+  debtSel.innerHTML =
+    '<option value="">— Schuld auswählen —</option>' +
+    debts.map(d =>
+      `<option value="${d.expId}" data-amt="${d.remaining}"${d.expId===curExpId?' selected':''}>${d.label} (€ ${d.remaining.toFixed(2)})</option>`
+    ).join('') +
+    `<option value="__general__" data-amt=""${curExpId==='__general__'?' selected':''}>Sonstiges / allgemein</option>`;
+  updatePemAmt();
+};
+
+window.updatePemAmt = function() {
+  const debtSel = document.getElementById('pem-debt');
+  const opt = debtSel.selectedOptions[0];
+  const amt = opt ? opt.dataset.amt : '';
+  if (amt) document.getElementById('pem-amt').value = amt;
+};
+
 window.addPaymentReceived = async function() {
   const from = document.getElementById('pay-from').value;
   const amt  = parseFloat(document.getElementById('pay-amt').value);
@@ -989,10 +1096,12 @@ window.addPaymentReceived = async function() {
   // This represents: currentUser received money FROM 'from'
   // In settlement: from pays currentUser directly, so we add it as a payment entry
   try {
+    const expId = document.getElementById('pay-debt').value || '__general__';
     const newPayRef = push(ref(db, 'groups/' + currentGroupKey + '/payments'));
-    await set(newPayRef, { id: newPayRef.key, from, to: currentUser, amount: amt, desc, ts: Date.now() });
+    await set(newPayRef, { id: newPayRef.key, from, to: currentUser, amount: amt, desc, expId, ts: Date.now() });
     document.getElementById('pay-amt').value = '';
     document.getElementById('pay-desc').value = '';
+    updateDebtSelector();
   } catch(e) { alert('Fehler: ' + e.message); }
 };
 

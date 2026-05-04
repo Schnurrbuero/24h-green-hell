@@ -884,7 +884,9 @@ function renderExpenses() {
 function renderPayList() {
   const el = document.getElementById('pay-list');
   if (!el) return;
-  const payments = Object.values(groupSnapshot?.payments || {});
+  // Use entries so we always have the Firebase key, even for old records without id field
+  const payments = Object.entries(groupSnapshot?.payments || {})
+    .map(([key, p]) => ({...p, id: p.id || key}));
   const mine = payments.filter(p => p.to === currentUser);
   if (mine.length === 0) { el.innerHTML = ''; return; }
   el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Eingetragene Zahlungen</div>' +
@@ -901,7 +903,8 @@ let editingPayId = null;
 
 window.openPayEditModal = function(id) {
   const payments = groupSnapshot?.payments || {};
-  const p = payments[id];
+  // Support both old records (no id field) and new ones
+  const p = payments[id] ? {...payments[id], id} : null;
   if (!p) return;
   editingPayId = id;
   const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
@@ -1138,7 +1141,11 @@ function renderAbrechnung(expenses, members, payments) {
       : bal<-0.005
       ? `<span class="balance-chip chip-neg">−€ ${Math.abs(bal).toFixed(2)}</span>`
       : `<span class="balance-chip chip-zero">ausgeglichen</span>`;
-    const myDirect = payments.filter(p => p.from === person || p.to === person);
+    // Ensure each payment has its id (support old records without id field)
+  const paymentsWithId = (groupSnapshot?.payments
+    ? Object.entries(groupSnapshot.payments).map(([k,p]) => ({...p, id: p.id||k}))
+    : payments);
+  const myDirect = paymentsWithId.filter(p => p.from === person || p.to === person);
     const directHtml = myDirect.length > 0
       ? myDirect.map(p => {
           const isPayer = p.from === person;

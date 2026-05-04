@@ -2484,7 +2484,7 @@ const WISSEN = [
       {label:'Länge & Kurven', hl:'25,378 km', text:'Die Nordschleife ist 25,378 km lang und hat 73 Kurven (33 Links, 40 Rechts). Für das 24h-Rennen wird sie mit dem GP-Kurs kombiniert – die Gesamtlänge beträgt dann rund 25,378 km (nur Nordschleife).'},
       {label:'Höhenunterschied', hl:'300 m', text:'Der Höhenunterschied zwischen dem tiefsten und höchsten Punkt der Strecke beträgt rund 300 Meter. Der höchste Punkt ist die Hohe Acht auf 617 m ü. NN, der tiefste liegt am Breidscheid.'},
       {label:'Bekannte Abschnitte', text:'Flugplatz, Hatzenbach, Hocheimbach, Schwedenkreuz, Aremberg, Fuchsröhre, Adenauer Forst, Metzgesfeld, Kallenhard, Wehrseifen, Breidscheid, Ex-Mühle, Lauda-Links, Bergwerk, Kesselchen, Klostertal, Caracciola-Karussell, Hohe Acht, Wippermann, Eschbach, Brünnchen, Eiskurve, Pflanzgarten, Sprunghügel, Schwalbenschwanz, Steilstrecke, Döttinger Höhe, Tiergarten, Antoniusbuche, Galgenkopf.'},
-      {label:'Rekordrundenzeit', hl:'5:19.546 min', text:'Den offiziellen Rundenrekord für Serienfahrzeuge hält der Porsche 911 GT2 RS MR mit 6:43.300 min (2018). Der Gesamtrekord auf der Nordschleife wurde 2018 von einem Porsche 919 Hybrid Evo mit 5:19.546 min aufgestellt.'},
+      {label:'Rekordrundenzeit', hl:'5:19.546 min', text:'Den offiziellen Rundenrekord für Serienfahrzeuge hält der Porsche 911 GT2 RS MR mit 6:43.300 min (2018). Der Gesamtrekord auf der Nordschleife wurde 2018 von einem Porsche 919 Hybrid Evo mit 5:19.546 min aufgestellt.', video:'WFHbnglmeUA', videoLabel:'🎬 Serienfahrzeug-Rekord: Porsche 911 GT2 RS MR (6:43.300 min)', video2:'PQmSUHhP3ug', video2Start:23, videoLabel2:'🎬 Absoluter Rekord: Porsche 919 Hybrid Evo (5:19.546 min)'},
       {label:'Charakteristika', text:'Die Strecke gilt als eine der anspruchsvollsten der Welt. Blinde Kuppen, enge Kurven, starke Höhenunterschiede und wechselnde Wetterbedingungen auf verschiedenen Streckenteilen machen sie zur ultimativen Herausforderung.'},
     ]
   },
@@ -2587,7 +2587,39 @@ window.showWissenDetail = function(id) {
         <div class="wissen-fact-label">${f.label}</div>
         ${f.hl ? `<div class="wissen-fact-highlight">${f.hl}</div>` : ''}
         <div class="wissen-fact-text">${f.text}</div>
+        ${f.video ? `
+          <div id="yt-box-${f.video}" style="margin-top:10px">
+            <button onclick="loadYT('${f.video}',0)"
+              style="display:flex;align-items:center;gap:8px;background:#ff0000;color:white;
+                border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;
+                cursor:pointer;width:100%">
+              <span style="font-size:18px">▶</span>
+              <span>${f.videoLabel||'Video ansehen'}</span>
+            </button>
+          </div>` : ''}
+        ${f.video2 ? `
+          <div id="yt-box-${f.video2}" style="margin-top:6px">
+            <button onclick="loadYT('${f.video2}',${f.video2Start||0})"
+              style="display:flex;align-items:center;gap:8px;background:#ff0000;color:white;
+                border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;
+                cursor:pointer;width:100%">
+              <span style="font-size:18px">▶</span>
+              <span>${f.videoLabel2||'Video ansehen'}</span>
+            </button>
+          </div>` : ''}
       </div>`).join('')}`;
+};
+
+window.loadYT = function(videoId, start) {
+  const box = document.getElementById('yt-box-' + videoId);
+  if (!box) return;
+  const startParam = start ? '&start=' + start : '';
+  box.innerHTML = `<div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;margin-top:4px">
+    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0${startParam}"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen></iframe>
+  </div>`;
 };
 
 window.backToWissen = function() {

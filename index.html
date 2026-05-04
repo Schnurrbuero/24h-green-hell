@@ -390,6 +390,7 @@
       <button class="nav-btn active" onclick="showSec('kosten',this)">Kosten</button>
       <button class="nav-btn" onclick="showSec('abrechnung',this)">Abrechnung</button>
       <button class="nav-btn" onclick="showSec('wetter',this)">Wetter</button>
+      <button class="nav-btn" onclick="showSec('livetiming',this)">📡 Live</button>
       <button class="nav-btn" onclick="showSec('strecke',this)">Strecke</button>
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
@@ -933,6 +934,82 @@
 <div onclick="toggleTeamDetail('999')" data-class="Cup 3" style="background:var(--surface);border-radius:var(--r-lg);border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px"><div style="background:#003d00;color:white;font-size:13px;font-weight:900;min-width:46px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:-0.5px">#999</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Mühlner Motorsport</div><div style="font-size:10px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Porsche Cayman GT4 CS</div><div style="margin-top:4px;display:flex;align-items:center;gap:5px"><span style="font-size:9px;font-weight:700;background:#003d00;color:white;padding:1px 6px;border-radius:8px">Cup 3</span><span style="font-size:9px;color:var(--text2);margin-left:4px">PRO</span><span style="font-size:9px;color:var(--text2)">Box 18</span></div></div><div style="font-size:16px;color:var(--text2)">▸</div></div><div id="team-detail-999" style="display:none;border-top:0.5px solid var(--border)"><div style="padding:8px 12px;font-size:11px;color:var(--text2);line-height:1.8"><strong style="color:var(--text)">Fahrer:</strong> Oleksandr Kosohov · Maxwell Polzler<br><strong style="color:var(--text)">Box:</strong> 18 &nbsp;<strong style="color:var(--text)">Klasse:</strong> Cup 3 &nbsp;<strong style="color:var(--text)">Einstufung:</strong> PRO</div></div></div>
         </div>
       </div>
+      <div class="section" id="sec-livetiming">
+        <div class="race-header" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:28px">📡</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:2px">Live-Timing</div>
+              <div style="font-size:11px;color:#aaa">Echtzeit-Standings · ADAC RAVENOL 24h 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hauptlink -->
+        <a href="https://www.24h-rennen.de/live" target="_blank"
+          style="display:flex;align-items:center;gap:14px;background:var(--red);color:white;
+            border-radius:var(--r-lg);padding:14px 16px;margin-bottom:12px;text-decoration:none">
+          <span style="font-size:32px">🔴</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;letter-spacing:0.3px">24h-rennen.de/live</div>
+            <div style="font-size:11px;opacity:0.85;margin-top:2px">Offizielles Live-Timing · alle Klassen · kostenlos</div>
+          </div>
+          <span style="margin-left:auto;font-size:20px">→</span>
+        </a>
+
+        <!-- Weitere Links -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">Weitere Quellen</div>
+
+          <a href="https://www.youtube.com/@24hNuerburgring" target="_blank"
+            style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);text-decoration:none;color:var(--text)">
+            <span style="font-size:24px;width:36px;text-align:center">▶️</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">YouTube – 24h Nürburgring</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:1px">Kompletter Livestream · kostenlos · Deutsch & Englisch</div>
+            </div>
+            <span style="color:var(--text2)">→</span>
+          </a>
+
+          <a href="https://www.youtube.com/@RedBullRacing" target="_blank"
+            style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);text-decoration:none;color:var(--text)">
+            <span style="font-size:24px;width:36px;text-align:center">🐂</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Red Bull Racing YouTube</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:1px">Verstappen-Onboard & Team-Coverage</div>
+            </div>
+            <span style="color:var(--text2)">→</span>
+          </a>
+
+          <a href="https://www.nitro.de" target="_blank"
+            style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);text-decoration:none;color:var(--text)">
+            <span style="font-size:24px;width:36px;text-align:center">📺</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">NITRO (Free-TV)</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:1px">Alle 24 Stunden live · auch RTL+ für Qualifying</div>
+            </div>
+            <span style="color:var(--text2)">→</span>
+          </a>
+
+          <a href="https://www.24h-rennen.de/fan-zeitplan" target="_blank"
+            style="display:flex;align-items:center;gap:12px;padding:10px 0;text-decoration:none;color:var(--text)">
+            <span style="font-size:24px;width:36px;text-align:center">📅</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Offizieller Fan-Zeitplan</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:1px">Immer aktuell · 24h-rennen.de/fan-zeitplan</div>
+            </div>
+            <span style="color:var(--text2)">→</span>
+          </a>
+        </div>
+
+        <div style="background:rgba(74,143,212,0.1);border:0.5px solid rgba(74,143,212,0.3);
+          border-radius:var(--r-lg);padding:10px 14px;font-size:11px;color:var(--text2);line-height:1.7">
+          💡 Das offizielle Live-Timing zeigt Echtzeit-Positionen, Rundenzeiten und Abstände
+          für alle 124 Teams und alle Klassen – am besten auf dem zweiten Bildschirm
+          oder Tablet während ihr am Ring seid!
+        </div>
+      </div>
+
       <div class="section" id="sec-wetter">
         <div class="weather-main">
           <div style="display:flex;align-items:flex-start;justify-content:space-between">

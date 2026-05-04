@@ -1264,12 +1264,38 @@ function calcTransfers(expenses, members, payments) {
   }
 
   const share = n > 0 ? total/n : 0; // kept for compat
-  return {total, share, paid, owed, transfers};
+
+  // ── Bilateral net debts (for explanation display) ──
+  // Raw bilateral: how much does each person owe each other per expense
+  const rawBil = {};
+  members.forEach(a => members.forEach(b => { rawBil[a+'|'+b] = 0; }));
+  expenses.forEach(e => {
+    const payer = e.who;
+    const sp = (e.splitWith&&e.splitWith.length>0) ? e.splitWith.filter(m=>members.includes(m)) : members;
+    const sh = sp.length > 0 ? parseFloat(e.amount)/sp.length : 0;
+    sp.forEach(m => { if(m!==payer && members.includes(payer)) rawBil[m+'|'+payer] += sh; });
+  });
+  directPayments.forEach(p => {
+    if(members.includes(p.from)&&members.includes(p.to)) rawBil[p.from+'|'+p.to] -= p.amount;
+  });
+  // Net bilateral (cancel A↔B)
+  const bilateral = {}; // bilateral[a][b] = net amount a owes b (positive)
+  members.forEach(a => { bilateral[a] = {}; members.forEach(b => { bilateral[a][b] = 0; }); });
+  const seenPairs = new Set();
+  members.forEach(a => members.forEach(b => {
+    if(a===b || seenPairs.has(b+'|'+a)) return;
+    seenPairs.add(a+'|'+b);
+    const net = rawBil[a+'|'+b] - rawBil[b+'|'+a];
+    if(net > 0.005)      bilateral[a][b] = +net.toFixed(2);
+    else if(net < -0.005) bilateral[b][a] = +(-net).toFixed(2);
+  }));
+
+  return {total, share, paid, owed, transfers, bilateral};
 }
 
 function renderAbrechnung(expenses, members, payments) {
   payments = payments || [];
-  const {total, share, paid, owed, transfers} = calcTransfers(expenses, members, payments);
+  const {total, share, paid, owed, transfers, bilateral} = calcTransfers(expenses, members, payments);
   document.getElementById('members-chips').innerHTML = members.map((m,i) => {
     const p = PALETTES[i % PALETTES.length];
     return `<div class="member-chip"><div class="member-av" style="background:${p.bg};color:${p.fg}">${m.slice(0,2).toUpperCase()}</div>${m}</div>`;
@@ -1346,30 +1372,54 @@ function renderAbrechnung(expenses, members, payments) {
     const directHtml = myDirect.length > 0
       ? myDirect.map(p => {
           const isPayer = p.from === person;
-          const canEdit = p.to === currentUser;
+          // Edit button only on ERHALTEN rows and only for the receiver (currentUser)
+          const canEdit = !isPayer && p.to === currentUser;
+          const expLabel = p.expId && p.expId !== '__general__' && groupSnapshot?.expenses?.[p.expId]
+            ? ' · ' + groupSnapshot.expenses[p.expId].desc : '';
           return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;
             padding:4px 8px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;font-weight:600;color:#4a8fd4">${isPayer?'✓ BEZAHLT':'✓ ERHALTEN'}</span>
-            <span style="font-size:11px;color:var(--text2)">${isPayer?'an '+p.to:'von '+p.from}${p.desc&&p.desc!=='Zahlung erhalten'?' · '+p.desc:''}</span>
+            <span style="font-size:11px;color:var(--text2)">${isPayer?'an '+p.to:'von '+p.from}${expLabel}${p.desc&&p.desc!=='Zahlung erhalten'?' ('+p.desc+')':''}</span>
             <span style="margin-left:auto;font-weight:600;color:#4a8fd4">€ ${parseFloat(p.amount).toFixed(2)}</span>
             ${canEdit?`<button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten" style="flex-shrink:0">✏️</button>`:''}
           </div>`;
         }).join('') : '';
 
-    // ── Noch ausstehende Ausgleichszahlungen ──
+    // ── Noch ausstehende Ausgleichszahlungen mit Erklärung ──
     const myT = transfers.filter(t => t.from === person);
     const transferHtml = myT.length > 0
-      ? myT.map(t => `<div class="payment-row">
-          <span style="font-size:11px;color:var(--text2)">zahlt an</span>
-          <span style="color:var(--text2)">→</span>
-          <span>${t.to}</span>
-          <span style="margin-left:auto;font-weight:500">€ ${t.amt.toFixed(2)}</span>
-        </div>`).join('')
+      ? myT.map(t => {
+          // Build explanation: what is this payment made up of?
+          const lines = [];
+          // Direct bilateral debt from person to t.to
+          const directDebt = (bilateral[person]&&bilateral[person][t.to]) || 0;
+          if (directDebt > 0.005)
+            lines.push(`<span style="font-size:10px;color:var(--text3)">Direktschuld: €${directDebt.toFixed(2)}</span>`);
+          // Transferred debts: third parties who owe t.to, routed through person
+          members.forEach(third => {
+            if (third === person || third === t.to) return;
+            const thirdOwesTo = (bilateral[third]&&bilateral[third][t.to]) || 0;
+            const personOwesThird = (bilateral[person]&&bilateral[person][third]) || 0;
+            if (thirdOwesTo > 0.005 && personOwesThird > 0.005)
+              lines.push(`<span style="font-size:10px;color:var(--text3)">inkl. ${third}s Schuld an ${t.to}: €${Math.min(thirdOwesTo,personOwesThird).toFixed(2)}</span>`);
+          });
+          // Credits (overpayments) that reduce this transfer
+          const toOwesFrom = (bilateral[t.to]&&bilateral[t.to][person]) || 0;
+          if (toOwesFrom > 0.005)
+            lines.push(`<span style="font-size:10px;color:var(--text3)">abzgl. Guthaben ${person}: €${toOwesFrom.toFixed(2)}</span>`);
+          return `<div class="payment-row" style="flex-direction:column;align-items:flex-start;gap:2px">
+            <div style="display:flex;width:100%;align-items:center;gap:6px">
+              <span style="font-size:11px;color:var(--text2)">zahlt an</span>
+              <span style="color:var(--text2)">→</span>
+              <span style="font-weight:600">${t.to}</span>
+              <span style="margin-left:auto;font-weight:600">€ ${t.amt.toFixed(2)}</span>
+            </div>
+            ${lines.length>0?`<div style="display:flex;flex-direction:column;gap:1px;padding-left:12px">${lines.join('')}</div>`:''}
+          </div>`;
+        }).join('')
       : bal > 0.005
         ? '<div class="pay-none">empfängt Ausgleich</div>'
-        : bal < -0.005
-          ? '<div class="pay-none">ausstehend (bereits verrechnet?)</div>'
-          : '<div class="pay-none">ausgeglichen ✓</div>';
+        : '<div class="pay-none">ausgeglichen ✓</div>';
 
     return `<div class="person-block">
       <div class="person-header">

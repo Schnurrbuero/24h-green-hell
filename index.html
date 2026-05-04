@@ -46,7 +46,7 @@
     #login-view.js-hidden { display: none !important; }
     /* main-view hidden by default until JS shows it */
     #main-view { display: none; }
-    #main-view.visible { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    #main-view.visible { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
     .header { background: #1a1a2e; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
     .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
@@ -371,6 +371,7 @@
   </div>
 
   <!-- MAIN APP -->
+  </div><!-- /app-top -->
   <div id="main-view">
     <div class="nav" id="main-nav">
       <button class="nav-btn active" onclick="showSec('kosten',this)">Kosten</button>
@@ -381,7 +382,6 @@
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
       <button class="nav-btn" onclick="showSec('packliste',this)">📦 Packliste</button>
     </div>
-  </div><!-- /app-top -->
     <div class="main-scroll">
 
       <div class="section active" id="sec-kosten">
@@ -562,10 +562,11 @@
 
     </div>
   </div>
-<div style="text-align:center;padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 20px);color:var(--text3);font-size:11px;line-height:1.7">
-  Erdacht &amp; konzipiert von<br>
-  <span style="font-weight:600;color:var(--text2);font-size:12px">derRené81</span>
-</div>
+    <div style="text-align:center;padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 20px);color:var(--text3);font-size:11px;line-height:1.7">
+      Erdacht &amp; konzipiert von<br>
+      <span style="font-weight:600;color:var(--text2);font-size:12px">derRené81</span>
+    </div>
+  </div><!-- /main-view -->
 
 <!-- STRECKE POPUP -->
 <div id="strecke-popup" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center" onclick="closeStreckePopup(event)">
@@ -739,9 +740,7 @@ function enterApp(data) {
   // Hide login, show app
   document.getElementById('login-view').classList.add('js-hidden');
   document.getElementById('main-view').classList.add('visible');
-  // Restore nav
-  const nav = document.getElementById('main-nav');
-  if (nav) nav.classList.remove('js-hidden');
+  // nav is inside main-view, shown with it
   // group bar
   document.getElementById('group-bar').style.display = 'flex';
   document.getElementById('bar-group-name').textContent = '📍 ' + (data.displayName || currentGroupKey);
@@ -774,8 +773,7 @@ window.logout = function() {
   document.getElementById('main-view').classList.remove('visible');
   document.getElementById('group-bar').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'none';
-  const nav = document.getElementById('main-nav');
-  if (nav) nav.classList.add('js-hidden');
+  // nav is inside main-view, hidden with it
   // Show login
   document.getElementById('login-view').classList.remove('js-hidden');
   // Reset sections for next login

@@ -391,7 +391,6 @@
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
       <button class="nav-btn" onclick="showSec('packliste',this)">📦 Packliste</button>
       <button class="nav-btn" onclick="showSec('shuttle',this)">🚌 Shuttle</button>
-      <button class="nav-btn" onclick="showSec('teams',this)">🏎 Teams</button>
     </div>
     <div class="main-scroll">
 
@@ -552,6 +551,7 @@
       </div>
 
       <div class="section" id="sec-shuttle">
+        <!-- Header -->
         <div class="race-header" style="margin-bottom:14px">
           <div style="display:flex;align-items:center;gap:10px">
             <span style="font-size:28px">🚌</span>
@@ -565,80 +565,18 @@
         <!-- Fahrplan -->
         <div class="card" style="margin-bottom:12px">
           <div class="card-title">🕐 Fahrplan</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:4px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
-              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Donnerstag</div>
-              <div style="font-size:13px;font-weight:600">08:00 – 24:00 Uhr</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Do · Fr · Sa</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">08:00 – 24:00 Uhr</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">Freitag bis 01:00 Uhr</div>
             </div>
             <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
-              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Freitag</div>
-              <div style="font-size:13px;font-weight:600">08:00 – 01:00 Uhr</div>
-            </div>
-            <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
-              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Samstag</div>
-              <div style="font-size:13px;font-weight:600">08:00 – 24:00 Uhr</div>
-            </div>
-            <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
-              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Sonntag</div>
-              <div style="font-size:13px;font-weight:600">00:00 – 18:00 Uhr</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Sonntag</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">00:00 – 18:00 Uhr</div>
             </div>
           </div>
         </div>
-
-        <!-- Route 1 -->
-        <div class="card" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-            <div style="background:#1a1a2e;color:white;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px">Route 1</div>
-            <div style="font-size:11px;color:var(--text2)">Nordschleife-Highlights</div>
-          </div>
-          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Hinfahrt</div>
-          <div style="position:relative;padding-left:20px"><div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div><div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Welcome Center</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Startpunkt</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Scharfer Kopf</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Umsteigemöglichkeit auf beide Buslinien</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Fahrsicherheitszentrum II</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Nur Freitag zur Falken Drift Show</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Eifeldorf</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">an der Zufahrt Parkplätze C1–C3</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">am Parkplatz C6a</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Hatzenbach / BMW Testcenter</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Schwalbenschwanz</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Pflanzgarten</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Brünnchen</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Endstation</div></div></div></div>
-          <div style="border-top:0.5px solid var(--border);margin:12px 0 8px"></div>
-          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Rückfahrt</div>
-          <div style="position:relative;padding-left:20px"><div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div><div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Pflanzgarten</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Schwalbenschwanz</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Hatzenbach / BMW Testcenter</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Welcome Center</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Rückfahrt-Endstation</div></div></div></div>
-        </div>
-
-        <!-- Route 2 -->
-        <div class="card" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-            <div style="background:#2d5a27;color:white;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px">Route 2</div>
-            <div style="font-size:11px;color:var(--text2)">Adenau-Linie</div>
-          </div>
-          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Hinfahrt</div>
-          <div style="position:relative;padding-left:20px"><div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div><div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Scharfer Kopf</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Startpunkt</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Fahrsicherheitszentrum II</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Nur Freitag zur Falken Drift Show</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Eifeldorf</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">an der Zufahrt Parkplätze C1–C3</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">am Parkplatz C6a</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Quiddelbacher Höhe / Hatzenbach</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Breidscheid</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Adenau Schule</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Adenau Mitte – Hauptstraße</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Endstation</div></div></div></div>
-          <div style="border-top:0.5px solid var(--border);margin:12px 0 8px"></div>
-          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Rückfahrt</div>
-          <div style="position:relative;padding-left:20px"><div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div><div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Breidscheid</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Quiddelbacher Höhe / Hatzenbach</div></div></div>
-            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Scharfer Kopf</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Rückfahrt-Endstation</div></div></div></div>
-        </div>
-
-        <!-- Umstieg-Hinweis -->
-        <div style="background:rgba(74,143,212,0.1);border:0.5px solid rgba(74,143,212,0.3);border-radius:var(--r-lg);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.7">
-          🔄 <strong style="color:var(--text)">Umstieg am Scharfer Kopf</strong> – hier kann zwischen Route 1 und Route 2 gewechselt werden.<br>
-          🏎 <strong style="color:var(--text)">Falken Drift Show</strong> – Stopp am Fahrsicherheitszentrum II nur freitags.
-        </div>
-      </div>
 
         <!-- Route 1 -->
         <div class="card" style="margin-bottom:12px">
@@ -684,247 +622,6 @@
         <!-- Hinweis -->
         <div style="background:rgba(74,143,212,0.1);border:0.5px solid rgba(74,143,212,0.3);border-radius:var(--r-lg);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.6">
           💡 <strong style="color:var(--text)">Tipp:</strong> Am Scharfer Kopf kann zwischen beiden Routen gewechselt werden. Route 1 fährt entlang der Nordschleife-Highlights, Route 2 bringt euch nach Adenau.
-        </div>
-      </div>
-
-      <div class="section" id="sec-teams">
-        <div class="race-header" style="margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:28px">🏎</span>
-            <div>
-              <div style="font-size:15px;font-weight:700;margin-bottom:2px">Teilnehmer 2025</div>
-              <div style="font-size:11px;color:#aaa">ADAC RAVENOL 24h Nürburgring · Auswahl Top-Teams</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-          <button class="pack-filter-btn active" onclick="filterTeams('alle',this)">Alle</button>
-          <button class="pack-filter-btn" onclick="filterTeams('SP 2T',this)">SP 2T</button><button class="pack-filter-btn" onclick="filterTeams('SP 3T',this)">SP 3T</button><button class="pack-filter-btn" onclick="filterTeams('SP 4T',this)">SP 4T</button><button class="pack-filter-btn" onclick="filterTeams('SP 9',this)">SP 9</button>
-        </div>
-
-        <div id="teams-list">
-        <div onclick="toggleTeamDetail('911')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#911</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Manthey EMA</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Porsche 911 GT3 R (992)</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔴</div>
-          </div>
-          <div id="team-detail-911" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/2022_Porsche_911_GT3_R_992.jpg/640px-2022_Porsche_911_GT3_R_992.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Kevin Estre · Ayhancan Güven · Thomas Preining · Patrick Pilet
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('98')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#98</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">ROWE RACING</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">BMW M4 GT3 EVO</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔵</div>
-          </div>
-          <div id="team-detail-98" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/BMW_M4_GT3_2022.jpg/640px-BMW_M4_GT3_2022.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Augusto Farfus · Jesse Krohn · Raffaele Marciello · Kelvin van der Linde
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('14')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#14</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Mercedes-AMG Team GetSpeed</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Mercedes-AMG GT3</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🩵</div>
-          </div>
-          <div id="team-detail-14" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Mercedes-AMG_GT3_Evo_2020.jpg/640px-Mercedes-AMG_GT3_Evo_2020.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Maro Engel · Maxime Martin · Fabian Schiller · Luca Stolz
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('27')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#27</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Red Bull Team ABT</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Lamborghini Huracán GT3 EVO2</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🟡</div>
-          </div>
-          <div id="team-detail-27" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Lamborghini_Huracan_GT3_Evo2_2023.jpg/640px-Lamborghini_Huracan_GT3_Evo2_2023.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Jordan Pepper · Mirko Bortolotti · Daniel Juncadella
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('63')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#63</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">HRT Ford Performance</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Ford Mustang GT3</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔵</div>
-          </div>
-          <div id="team-detail-63" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/2024_Ford_Mustang_GT3.jpg/640px-2024_Ford_Mustang_GT3.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Hubert Haupt · Patrick Assenheimer · Vincent Kolb · Dirk Müller
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('33')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#1a1a2e;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#33</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Falken Motorsports</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Porsche 911 GT3 R (992)</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#1a1a2e;color:white;
-                  padding:1px 7px;border-radius:10px">SP 9</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔵</div>
-          </div>
-          <div id="team-detail-33" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/2022_Porsche_911_GT3_R_992.jpg/640px-2022_Porsche_911_GT3_R_992.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Julien Andlauer · Nico Menzel · Sven Müller · Alessio Picariello
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('88')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#5a2d82;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#88</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Subaru Tecnica International</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Subaru WRX</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#5a2d82;color:white;
-                  padding:1px 7px;border-radius:10px">SP 4T</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔵</div>
-          </div>
-          <div id="team-detail-88" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Subaru_WRX_Nurburgring.jpg/640px-Subaru_WRX_Nurburgring.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Carlo van Dam · Tim Schrick · Kota Sasaki · Rintaro Kubo
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('109')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#8b0000;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#109</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">Toyota GAZOO ROOKIE Racing</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">Toyota GR Yaris</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#8b0000;color:white;
-                  padding:1px 7px;border-radius:10px">SP 2T</span>
-              </div>
-            </div>
-            <div style="font-size:18px">🔴</div>
-          </div>
-          <div id="team-detail-109" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Toyota_GR_Yaris_2021.jpg/640px-Toyota_GR_Yaris_2021.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Morizo · Daisuke Toyoda · Hiroaki Ishiura · Kazuya Oshima
-            </div>
-          </div>
-        </div>
-        <div onclick="toggleTeamDetail('13')" style="background:var(--surface);border-radius:var(--r-lg);
-          border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px">
-            <div style="background:#2d5a27;color:white;font-size:18px;font-weight:900;
-              min-width:48px;height:48px;border-radius:10px;display:flex;align-items:center;
-              justify-content:center;flex-shrink:0">#13</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">White Angel for Fly and Help</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:1px">VW Beetle RSR</div>
-              <div style="margin-top:4px">
-                <span style="font-size:9px;font-weight:700;background:#2d5a27;color:white;
-                  padding:1px 7px;border-radius:10px">SP 3T</span>
-              </div>
-            </div>
-            <div style="font-size:18px">⚫</div>
-          </div>
-          <div id="team-detail-13" style="display:none;border-top:0.5px solid var(--border)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/VW_Beetle_RSR_Nuerburgring.jpg/640px-VW_Beetle_RSR_Nuerburgring.jpg" onerror="this.style.display='none'"
-              style="width:100%;max-height:200px;object-fit:cover;display:block">
-            <div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7">
-              <strong style="color:var(--text)">Fahrer:</strong> Bernd Albrecht · Carsten Knechtges · Sebastian Asch · Oliver Bliss
-            </div>
-          </div>
-        </div>
-        </div>
-
-        <div style="text-align:center;padding:8px 0 4px;font-size:11px;color:var(--text2)">
-          Vollständige Liste: <a href="https://www.24h-rennen.de/teilnehmer/" target="_blank"
-            style="color:var(--red)">24h-rennen.de/teilnehmer</a>
         </div>
       </div>
 
@@ -2037,23 +1734,6 @@ window.deletePackItem = async function(id) {
   try {
     await remove(ref(db, 'groups/' + currentGroupKey + '/packliste/' + id));
   } catch(e) { alert('Fehler: ' + e.message); }
-};
-
-window.toggleTeamDetail = function(nr) {
-  const el = document.getElementById('team-detail-' + nr);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-};
-
-window.filterTeams = function(cls, btn) {
-  document.querySelectorAll('.pack-filter-btn').forEach(b => {
-    if (b.closest('#sec-teams')) b.classList.remove('active');
-  });
-  if (btn) btn.classList.add('active');
-  document.querySelectorAll('#teams-list > div').forEach(card => {
-    if (cls === 'alle') { card.style.display = ''; return; }
-    const badge = card.querySelector('span[style*="border-radius:10px"]');
-    if (badge) card.style.display = badge.textContent.trim() === cls ? '' : 'none';
-  });
 };
 
 window.showSec = function(id, btn) {

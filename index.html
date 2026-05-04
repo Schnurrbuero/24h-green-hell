@@ -479,6 +479,21 @@
 
       <div class="section" id="sec-packliste">
         <div class="card" style="margin-bottom:12px">
+          <div class="card-title">Eintrag hinzufügen</div>
+          <div class="pack-add-row">
+            <input type="text" id="pack-item" placeholder="Was? z.B. Campingkocher" style="flex:1">
+            <select id="pack-cat" style="flex:0 0 120px;width:auto">
+              <option value="Essen & Trinken">🍺 Essen</option>
+              <option value="Ausrüstung">⛺ Ausrüstung</option>
+              <option value="Sonstiges">📦 Sonstiges</option>
+            </select>
+          </div>
+          <div class="pack-add-row" style="margin-top:8px">
+            <select id="pack-who" style="flex:1;width:auto"></select>
+            <button class="btn-primary" onclick="addPackItem()" style="flex:0 0 auto;padding:0 18px">+ Hinzufügen</button>
+          </div>
+        </div>
+        <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div class="card-title" style="margin:0">Was wer mitbringt</div>
             <div id="pack-stats" style="font-size:11px;color:var(--text2)"></div>
@@ -515,21 +530,6 @@
             </table>
           </div>
           <div id="pack-empty" class="pack-empty" style="display:none">Noch nichts eingetragen ✨</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Eintrag hinzufügen</div>
-          <div class="pack-add-row">
-            <input type="text" id="pack-item" placeholder="Was? z.B. Campingkocher" style="flex:1">
-            <select id="pack-cat" style="flex:0 0 120px;width:auto">
-              <option value="Essen & Trinken">🍺 Essen</option>
-              <option value="Ausrüstung">⛺ Ausrüstung</option>
-              <option value="Sonstiges">📦 Sonstiges</option>
-            </select>
-          </div>
-          <div class="pack-add-row" style="margin-top:8px">
-            <select id="pack-who" style="flex:1;width:auto"></select>
-            <button class="btn-primary" onclick="addPackItem()" style="flex:0 0 auto;padding:0 18px">+ Hinzufügen</button>
-          </div>
         </div>
       </div>
 
@@ -1358,17 +1358,17 @@ function buildStreckeSVG() {
   h += "<circle cx=\"489\" cy=\"78\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bergwerk&apos;)\"/>";
   h += "<text x=\"517\" y=\"84\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bergwerk&apos;)\">Bergwerk</text>";
   h += "<circle cx=\"546\" cy=\"120\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kesselchen&apos;)\"/>";
-  h += "<text x=\"574\" y=\"126\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kesselchen&apos;)\">Kesselchen</text>";
+  h += "<text x=\"546\" y=\"105\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kesselchen&apos;)\">Kesselchen</text>";
   h += "<circle cx=\"605\" cy=\"119\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;klostertal&apos;)\"/>";
-  h += "<text x=\"633\" y=\"125\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;klostertal&apos;)\">Klostertal</text>";
+  h += "<text x=\"605\" y=\"148\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;klostertal&apos;)\">Klostertal</text>";
   h += "<circle cx=\"648\" cy=\"174\" r=\"14\" fill=\"" + RED + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;karussell&apos;)\"/>";
-  h += "<text x=\"680\" y=\"180\" text-anchor=\"start\" font-size=\"20\" font-weight=\"700\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;karussell&apos;)\">Karussell</text>";
+  h += "<text x=\"616\" y=\"180\" text-anchor=\"end\" font-size=\"20\" font-weight=\"700\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;karussell&apos;)\">Karussell</text>";
   h += "<circle cx=\"708\" cy=\"114\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hoheacht&apos;)\"/>";
-  h += "<text x=\"736\" y=\"120\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hoheacht&apos;)\">Hohe Acht</text>";
+  h += "<text x=\"708\" y=\"97\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hoheacht&apos;)\">Hohe Acht</text>";
   h += "<circle cx=\"798\" cy=\"164\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wippermann&apos;)\"/>";
-  h += "<text x=\"826\" y=\"170\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wippermann&apos;)\">Wippermann</text>";
+  h += "<text x=\"798\" y=\"148\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wippermann&apos;)\">Wippermann</text>";
   h += "<circle cx=\"810\" cy=\"167\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bruennchen&apos;)\"/>";
-  h += "<text x=\"838\" y=\"173\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bruennchen&apos;)\">Brünnchen</text>";
+  h += "<text x=\"810\" y=\"192\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bruennchen&apos;)\">Brünnchen</text>";
   h += "<circle cx=\"773\" cy=\"218\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;eiskurve&apos;)\"/>";
   h += "<text x=\"801\" y=\"224\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;eiskurve&apos;)\">Eiskurve</text>";
   h += "<circle cx=\"735\" cy=\"258\" r=\"14\" fill=\"" + RED + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;pflanzgarten&apos;)\"/>";
@@ -1380,9 +1380,9 @@ function buildStreckeSVG() {
   h += "<circle cx=\"590\" cy=\"400\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;doettinger&apos;)\"/>";
   h += "<text x=\"618\" y=\"406\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;doettinger&apos;)\">Döttinger Höhe</text>";
   h += "<circle cx=\"480\" cy=\"462\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;tiergarten&apos;)\"/>";
-  h += "<text x=\"508\" y=\"468\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;tiergarten&apos;)\">Tiergarten</text>";
+  h += "<text x=\"480\" y=\"486\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;tiergarten&apos;)\">Tiergarten</text>";
   h += "<circle cx=\"510\" cy=\"442\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;antoniusbuche&apos;)\"/>";
-  h += "<text x=\"538\" y=\"448\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;antoniusbuche&apos;)\">Antoniusbuche</text>";
+  h += "<text x=\"510\" y=\"426\" text-anchor=\"middle\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;antoniusbuche&apos;)\">Antoniusbuche</text>";
   h += "<circle cx=\"279\" cy=\"706\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;dunlop&apos;)\"/>";
   h += "<text x=\"307\" y=\"712\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;dunlop&apos;)\">Dunlop-Kehre</text>";
   svg.innerHTML = h;

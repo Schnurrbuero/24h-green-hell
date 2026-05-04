@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Ring 2026" />
+  <meta name="description" content="24h Nürburgring 2026 – Gruppen-App" />
+  <title>24h Nürburgring 2026</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg: #f5f5f0; --surface: #ffffff; --surface2: #f0ede8;
+      --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
+      --text: #1a1a1a; --text2: #666; --text3: #999;
+      --info-bg: #e6f1fb; --info-fg: #0c447c;
+      --success-bg: #eaf3de; --success-fg: #27500a;
+      --warn-bg: #faeeda; --warn-fg: #633806;
+      --danger-bg: #fcebeb; --danger-fg: #791f1f;
+      --accent: #1a1a2e; --red: #e24b4a; --green: #1D9E75;
+      --r-md: 8px; --r-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111118; --surface: #1c1c26; --surface2: #25252f;
+        --border: rgba(255,255,255,0.10); --border2: rgba(255,255,255,0.18);
+        --text: #f0f0f0; --text2: #aaa; --text3: #555;
+        --info-bg: #0c2a44; --info-fg: #85b7eb;
+        --success-bg: #0d2a1a; --success-fg: #9fe1cb;
+        --warn-bg: #2a1f0a; --warn-fg: #fac775;
+        --danger-bg: #2a0f0f; --danger-fg: #f09595;
+      }
+    }
+    html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); }
+    .app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+    .header { background: #1a1a2e; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
+    .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
+    .header-sub { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+    .live-badge { background: var(--red); color: white; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+    .group-bar { display: flex; align-items: center; justify-content: space-between; padding: 7px 18px; background: rgba(255,255,255,0.07); border-top: 0.5px solid rgba(255,255,255,0.1); }
+    .group-bar-name { font-size: 12px; font-weight: 500; color: #ddd; }
+    .group-bar-user { font-size: 11px; color: #888; }
+    .logout-btn { background: none; border: none; color: var(--red); font-size: 12px; cursor: pointer; }
+    .sync-indicator { font-size: 10px; color: #4ade80; display: flex; align-items: center; gap: 4px; }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+    .nav { display: flex; background: var(--surface); border-bottom: 0.5px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-btn { flex-shrink: 0; padding: 10px 14px; font-size: 12px; font-weight: 500; color: var(--text2); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .nav-btn.active { color: var(--text); border-bottom-color: var(--red); }
+    .main-scroll { flex: 1; overflow-y: auto; }
+    .section { display: none; padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 14px); }
+    .section.active { display: block; }
+    .card { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); padding: 14px; margin-bottom: 12px; }
+    .card-title { font-size: 10px; font-weight: 600; color: var(--text2); margin-bottom: 11px; text-transform: uppercase; letter-spacing: 0.9px; }
+    input, select { height: 38px; padding: 0 11px; border: 0.5px solid var(--border2); border-radius: var(--r-md); font-size: 14px; background: var(--surface); color: var(--text); width: 100%; outline: none; }
+    input:focus, select:focus { border-color: #4a4a9a; }
+    .field-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; margin-top: 13px; }
+    .field-label:first-child { margin-top: 0; }
+    .btn-primary { height: 40px; padding: 0 16px; background: #1a1a2e; color: white; border: none; border-radius: var(--r-md); font-size: 14px; font-weight: 500; cursor: pointer; }
+    @media (prefers-color-scheme: dark) { .btn-primary { background: #4a4a7a; } }
+    .btn-secondary { height: 38px; padding: 0 14px; background: var(--surface); color: var(--text); border: 0.5px solid var(--border2); border-radius: var(--r-md); font-size: 13px; cursor: pointer; }
+    .btn-full { width: 100%; }
+    .form-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .form-row input, .form-row select { width: auto; flex: 1; }
+    .error-msg { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 16px; }
+    .info-box { background: var(--info-bg); border: 0.5px solid rgba(55,138,221,0.3); border-radius: var(--r-md); padding: 10px 12px; font-size: 12px; color: var(--info-fg); margin-bottom: 12px; line-height: 1.6; }
+
+    /* LOGIN */
+    .login-screen { padding: 28px 16px; }
+    .login-logo { text-align: center; margin-bottom: 28px; }
+    .login-logo-icon { width: 60px; height: 60px; background: #1a1a2e; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .login-logo-icon svg { width: 30px; height: 30px; fill: white; }
+    .login-logo h2 { font-size: 20px; font-weight: 600; color: var(--text); }
+    .login-logo p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+    .login-tabs { display: flex; margin-bottom: 18px; border: 0.5px solid var(--border2); border-radius: var(--r-md); overflow: hidden; }
+    .login-tab { flex: 1; height: 36px; background: none; border: none; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text2); }
+    .login-tab.active { background: #1a1a2e; color: white; }
+    @media (prefers-color-scheme: dark) { .login-tab.active { background: #4a4a7a; } }
+
+    /* EXPENSES */
+    .expense-list { max-height: 260px; overflow-y: auto; }
+    .expense-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--border); gap: 8px; }
+    .expense-item:last-child { border-bottom: none; }
+    .exp-who { font-size: 11px; background: var(--info-bg); color: var(--info-fg); padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+    .exp-desc { font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .exp-amount { font-size: 13px; font-weight: 500; flex-shrink: 0; }
+    .del-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; padding: 0 2px; flex-shrink: 0; line-height: 1; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .metric { background: var(--surface2); border-radius: var(--r-md); padding: 10px 12px; }
+    .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 3px; }
+    .metric-val { font-size: 20px; font-weight: 500; }
+
+    /* ABRECHNUNG */
+    .members-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .member-chip { display: flex; align-items: center; gap: 5px; background: var(--surface2); border-radius: 20px; padding: 3px 10px 3px 5px; font-size: 12px; }
+    .member-av { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; }
+    .person-block { border-bottom: 0.5px solid var(--border); padding: 12px 0; }
+    .person-block:first-child { padding-top: 0; }
+    .person-block:last-child { border-bottom: none; padding-bottom: 0; }
+    .person-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+    .person-name-txt { font-size: 14px; font-weight: 500; }
+    .person-meta { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .balance-chip { margin-left: auto; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .chip-pos { color: var(--green); }
+    .chip-neg { color: var(--red); }
+    .chip-zero { color: var(--text3); }
+    .payment-row { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 0 3px 44px; }
+    .pay-none { font-size: 12px; color: var(--text3); padding: 3px 0 0 44px; }
+
+    /* EDIT MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: flex-end; justify-content: center; z-index: 500; padding-bottom: env(safe-area-inset-bottom, 0); }
+    .modal-box { background: var(--surface); border-radius: 16px 16px 0 0; padding: 20px 16px 24px; width: 100%; max-width: 480px; }
+    .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
+    .modal-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .modal-row input, .modal-row select { width: auto; flex: 1; }
+    .modal-row input[type=number] { flex: 0 0 115px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .btn-save { flex: 1; height: 40px; background: #1a1a2e; color: white; border: none; border-radius: var(--r-md); font-size: 14px; font-weight: 500; cursor: pointer; }
+    @media (prefers-color-scheme: dark) { .btn-save { background: #4a4a7a; } }
+    .btn-cancel { flex: 0 0 90px; height: 40px; background: var(--surface2); color: var(--text2); border: 0.5px solid var(--border2); border-radius: var(--r-md); font-size: 14px; cursor: pointer; }
+    .btn-delete-exp { flex: 0 0 42px; height: 40px; background: var(--danger-bg); color: var(--danger-fg); border: none; border-radius: var(--r-md); font-size: 18px; cursor: pointer; }
+    .edit-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 0 3px; flex-shrink: 0; line-height: 1; }
+    .edit-btn:hover { color: var(--text2); }
+
+    /* LIVE LINK BUTTONS */
+    .live-link-btn { display: flex; align-items: center; gap: 14px; background: #1a1a2e; border-radius: var(--r-lg); padding: 16px; margin-bottom: 10px; text-decoration: none; transition: opacity 0.15s; }
+    .live-link-btn:active { opacity: 0.8; }
+    .live-link-btn-secondary { background: var(--surface); border: 0.5px solid var(--border); }
+    .live-link-icon { width: 42px; height: 42px; background: var(--red); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .live-link-icon-secondary { background: var(--surface2); color: var(--text2); }
+    .live-link-text { flex: 1; }
+    .live-link-title { font-size: 14px; font-weight: 600; color: white; }
+    .live-link-btn-secondary .live-link-title { color: var(--text); }
+    .live-link-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+    .live-link-btn-secondary .live-link-sub { color: var(--text3); }
+    .live-link-arrow { font-size: 18px; color: rgba(255,255,255,0.4); flex-shrink: 0; }
+    .live-link-btn-secondary .live-link-arrow { color: var(--text3); }
+
+    /* RACE */
+    .race-header { background: #1a1a2e; border-radius: var(--r-lg); padding: 14px; margin-bottom: 12px; color: white; }
+    .race-header h2 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .race-header p { font-size: 11px; color: #aaa; }
+    .race-meta { display: flex; gap: 20px; margin-top: 10px; }
+    .race-meta span { font-size: 10px; color: #aaa; }
+    .race-meta strong { font-size: 12px; color: white; display: block; margin-top: 1px; }
+    .flag-banner { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r-md); margin-bottom: 12px; font-size: 13px; font-weight: 500; background: var(--success-bg); color: var(--success-fg); border: 0.5px solid rgba(29,158,117,0.4); }
+    .flag-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; background: var(--green); }
+    .standings-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .standings-table th { font-size: 10px; text-transform: uppercase; color: var(--text2); padding: 5px 6px; text-align: left; border-bottom: 0.5px solid var(--border); letter-spacing: 0.5px; }
+    .standings-table td { font-size: 12px; padding: 7px 6px; border-bottom: 0.5px solid var(--border); color: var(--text); }
+    .standings-table tr:last-child td { border-bottom: none; }
+    .car-num { display: inline-block; background: var(--surface2); border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; }
+    .cls-gt3 { color: var(--green); font-size: 10px; }
+    .gap-c { color: var(--text2); font-size: 11px; }
+
+    /* NEWS */
+    .news-item { padding: 11px 0; border-bottom: 0.5px solid var(--border); }
+    .news-item:last-child { border-bottom: none; }
+    .news-time { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+    .news-text { font-size: 13px; line-height: 1.5; }
+    .news-tag { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-bottom: 4px; font-weight: 500; }
+    .tag-s { background: var(--info-bg); color: var(--info-fg); }
+    .tag-i { background: var(--danger-bg); color: var(--danger-fg); }
+    .tag-n { background: var(--success-bg); color: var(--success-fg); }
+
+    /* STRECKE */
+    .strecke-map-wrap { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); overflow: hidden; }
+    .s-seg { cursor: pointer; }
+    .s-seg:hover .s-path { stroke-width: 7; }
+    .s-label { cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .s-dot { cursor: pointer; }
+
+    /* WISSENSWERTES */
+    .wissen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .wissen-chip { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 14px 12px; cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; }
+    .wissen-chip:active { background: var(--surface2); }
+    .wissen-chip-icon { font-size: 26px; margin-bottom: 6px; }
+    .wissen-chip-label { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .wissen-chip-sub { font-size: 10px; color: var(--text2); margin-top: 2px; }
+    .wissen-back-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--text2); font-size: 13px; cursor: pointer; padding: 0 0 14px 0; font-weight: 500; }
+    .wissen-detail-header { background: #1a1a2e; border-radius: var(--r-lg); padding: 16px; margin-bottom: 12px; color: white; }
+    .wissen-detail-icon { font-size: 32px; margin-bottom: 8px; }
+    .wissen-detail-title { font-size: 17px; font-weight: 600; }
+    .wissen-detail-sub { font-size: 12px; color: #aaa; margin-top: 3px; }
+    .wissen-fact { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 14px; margin-bottom: 10px; }
+    .wissen-fact-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); margin-bottom: 6px; }
+    .wissen-fact-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+    .wissen-fact-highlight { font-size: 22px; font-weight: 700; color: var(--red); margin-bottom: 2px; }
+
+    .exp-toggle-btn { background: none; border: none; font-size: 11px; color: var(--text2); cursor: pointer; padding: 4px 0 4px 44px; display: block; }
+    .exp-breakdown { margin: 2px 0 2px 44px; background: var(--surface2); border-radius: var(--r-md); padding: 6px 10px; }
+    .exp-breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; gap: 8px; }
+    .exp-breakdown-row:last-child { border-bottom: none; }
+    .exp-breakdown-desc { color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .exp-breakdown-amt { color: var(--text2); font-weight: 500; flex-shrink: 0; }
+
+    /* QUIZ */
+    .quiz-progress { display: flex; gap: 4px; margin-bottom: 16px; }
+    .quiz-prog-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border2); }
+    .quiz-prog-dot.done { background: var(--green); }
+    .quiz-prog-dot.wrong { background: var(--red); }
+    .quiz-prog-dot.active { background: #1a1a2e; }
+    .quiz-q-card { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); padding: 16px; margin-bottom: 12px; }
+    .quiz-q-num { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+    .quiz-q-text { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt { background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--r-md); padding: 12px 14px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; transition: background 0.1s, border-color 0.1s; line-height: 1.4; }
+    .quiz-opt:active { background: var(--surface2); }
+    .quiz-opt.correct { background: var(--success-bg); border-color: var(--green); color: var(--success-fg); font-weight: 500; }
+    .quiz-opt.wrong { background: var(--danger-bg); border-color: var(--red); color: var(--danger-fg); }
+    .quiz-opt.reveal { background: var(--success-bg); border-color: var(--green); color: var(--success-fg); opacity: 0.6; }
+    .quiz-explanation { background: var(--surface2); border-radius: var(--r-md); padding: 12px; font-size: 13px; color: var(--text2); line-height: 1.5; margin-top: 10px; }
+    .quiz-next-btn { width: 100%; height: 42px; background: #1a1a2e; color: white; border: none; border-radius: var(--r-md); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 12px; }
+    @media (prefers-color-scheme: dark) { .quiz-next-btn { background: #4a4a7a; } }
+    .quiz-result-card { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); padding: 24px 16px; text-align: center; margin-bottom: 12px; }
+    .quiz-score-big { font-size: 52px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .quiz-score-label { font-size: 14px; color: var(--text2); margin-bottom: 16px; }
+    .quiz-score-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+    .quiz-score-fill { height: 100%; border-radius: 4px; background: var(--green); transition: width 0.8s ease; }
+    .quiz-result-msg { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .quiz-result-sub { font-size: 13px; color: var(--text2); }
+    .quiz-answers-summary { margin-top: 14px; }
+    .quiz-ans-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+    .quiz-ans-row:last-child { border-bottom: none; }
+    .quiz-ans-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .quiz-ans-q { color: var(--text); flex: 1; line-height: 1.4; }
+    .quiz-ans-a { color: var(--text2); margin-top: 2px; }
+
+    /* WETTER */
+    .weather-main { background: #1a1a2e; border-radius: var(--r-lg); padding: 18px; margin-bottom: 12px; color: white; }
+    .weather-temp { font-size: 52px; font-weight: 300; line-height: 1; }
+    .weather-desc { font-size: 13px; color: #aaa; margin: 4px 0 16px; }
+    .weather-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .wd-val { font-size: 15px; font-weight: 500; }
+    .wd-lbl { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .hourly { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .hourly::-webkit-scrollbar { display: none; }
+    .hour-item { flex-shrink: 0; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-md); padding: 9px 10px; text-align: center; min-width: 58px; }
+    .hour-time { font-size: 10px; color: var(--text2); }
+    .hour-icon { font-size: 18px; margin: 3px 0; }
+    .hour-temp { font-size: 13px; font-weight: 500; }
+    .hour-rain { font-size: 10px; color: var(--text2); margin-top: 1px; }
+    .w-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wm { background: var(--surface2); border-radius: var(--r-md); padding: 10px 12px; }
+    .wm-lbl { font-size: 11px; color: var(--text2); margin-bottom: 3px; }
+    .wm-val { font-size: 17px; font-weight: 500; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay { position: fixed; inset: 0; background: #1a1a2e; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999; }
+    .loading-overlay p { color: #aaa; font-size: 14px; }
+    .loading-spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <p>Verbinde mit Firebase…</p>
+</div>
+
+<div class="app" id="app" style="display:none">
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <h1>24h Nürburgring 2026</h1>
+        <div class="header-sub">Mai 2026 · Nordschleife</div>
+      </div>
+      <span class="live-badge">LIVE</span>
+    </div>
+    <div id="group-bar" style="display:none" class="group-bar">
+      <div>
+        <div class="group-bar-name" id="bar-group-name"></div>
+        <div class="group-bar-user" id="bar-user-name"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="sync-indicator" id="sync-indicator" style="display:none">
+          <div class="sync-dot"></div><span>Live</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Abmelden</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login-view" class="main-scroll">
+    <div class="login-screen">
+      <div class="login-logo">
+        <div class="login-logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        </div>
+        <h2>Gruppe beitreten</h2>
+        <p>Verbinde dich mit deinen Mitfahrern</p>
+      </div>
+      <div class="login-tabs">
+        <button class="login-tab active" id="tab-join" onclick="switchTab('join')">Beitreten</button>
+        <button class="login-tab" id="tab-create" onclick="switchTab('create')">Neue Gruppe</button>
+      </div>
+      <div id="panel-join">
+        <div class="field-label">Dein Name</div>
+        <input type="text" id="join-username" placeholder="z.B. Jenny" autocomplete="name" />
+        <div class="field-label">Gruppenname</div>
+        <input type="text" id="join-groupname" placeholder="z.B. Ring2026" autocomplete="off" />
+        <div class="field-label">Passwort</div>
+        <input type="password" id="join-password" placeholder="Gruppenpasswort" />
+        <div class="error-msg" id="join-error"></div>
+        <div style="margin-top:14px">
+          <button class="btn-primary btn-full" onclick="joinGroup()" id="join-btn">Beitreten</button>
+        </div>
+      </div>
+      <div id="panel-create" style="display:none">
+        <div class="info-box">Erstelle eine Gruppe und teile Gruppenname + Passwort mit allen Mitfahrern. Jede Person die beitritt wird automatisch als Zahler geführt.</div>
+        <div class="field-label">Dein Name</div>
+        <input type="text" id="create-username" placeholder="z.B. Jenny" autocomplete="name" />
+        <div class="field-label">Gruppenname</div>
+        <input type="text" id="create-groupname" placeholder="z.B. Ring2026" autocomplete="off" />
+        <div class="field-label">Passwort wählen</div>
+        <input type="password" id="create-password" placeholder="Passwort festlegen" />
+        <div class="field-label">Passwort bestätigen</div>
+        <input type="password" id="create-password2" placeholder="Passwort wiederholen" />
+        <div class="error-msg" id="create-error"></div>
+        <div style="margin-top:14px">
+          <button class="btn-primary btn-full" onclick="createGroup()" id="create-btn">Gruppe erstellen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="main-view" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+    <div class="nav">
+      <button class="nav-btn active" onclick="showSec('kosten',this)">Kosten</button>
+      <button class="nav-btn" onclick="showSec('abrechnung',this)">Abrechnung</button>
+      <button class="nav-btn" onclick="showSec('wetter',this)">Wetter</button>
+      <button class="nav-btn" onclick="showSec('strecke',this)">Strecke</button>
+      <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
+      <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
+    </div>
+    <div class="main-scroll">
+
+      <div class="section active" id="sec-kosten">
+        <div class="card">
+          <div class="card-title">Ausgabe hinzufügen</div>
+          <div class="form-row">
+            <select id="buyer-sel" style="flex:0 0 115px;width:auto"></select>
+            <input type="text" id="desc-in" placeholder="Beschreibung" style="width:auto;flex:1" />
+          </div>
+          <div class="form-row">
+            <input type="number" id="amt-in" placeholder="Betrag €" step="0.01" min="0" style="width:auto;flex:0 0 115px" />
+            <button class="btn-primary" style="flex:1" onclick="addExp()">+ Hinzufügen</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ausgaben <span id="exp-count" style="font-weight:400;text-transform:none;letter-spacing:0">(0)</span></div>
+          <div class="expense-list" id="exp-list">
+            <div style="font-size:13px;color:var(--text2);padding:16px 0;text-align:center">Noch keine Ausgaben</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Übersicht</div>
+          <div class="summary-grid">
+            <div class="metric"><div class="metric-label">Gesamtkosten</div><div class="metric-val" id="total-val">€ 0</div></div>
+            <div class="metric"><div class="metric-label">Anteil pro Person</div><div class="metric-val" id="share-val">€ 0</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Zahlung erhalten</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Geld von jemandem bekommen? Hier eintragen – wird nur bei dieser Person als Zahlung verrechnet.</div>
+          <div class="form-row">
+            <select id="pay-from" style="width:auto;flex:1"></select>
+            <input type="number" id="pay-amt" placeholder="Betrag €" step="0.01" min="0.01" style="width:auto;flex:0 0 110px">
+          </div>
+          <div class="form-row" style="margin-top:8px">
+            <input type="text" id="pay-desc" placeholder="Notiz (optional)" style="flex:1">
+            <button class="btn-primary" onclick="addPaymentReceived()" style="flex:0 0 auto;padding:0 16px">Eintragen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-abrechnung">
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">Mitglieder</div>
+          <div class="members-row" id="members-chips"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Personen &amp; Ausgleichszahlungen</div>
+          <div id="all-persons"></div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-wissen">
+        <div id="wissen-list"></div>
+        <div id="wissen-detail" style="display:none">
+          <button onclick="backToWissen()" class="wissen-back-btn">← Zurück</button>
+          <div id="wissen-detail-content"></div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-quiz">
+        <div id="quiz-start">
+          <div class="race-header" style="margin-bottom:14px">
+            <h2>Nordschleife Quiz</h2>
+            <p>Teste dein Wissen über die Grüne Hölle</p>
+          </div>
+          <div class="card" style="text-align:center;padding:24px 16px">
+            <div style="font-size:40px;margin-bottom:12px">🏁</div>
+            <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">10 Fragen · Multiple Choice</div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Basierend auf den Inhalten aus dem Wissenswertes-Tab</div>
+            <button class="btn-primary btn-full" onclick="startQuiz()" style="height:44px;font-size:15px">Quiz starten</button>
+          </div>
+        </div>
+        <div id="quiz-question" style="display:none"></div>
+        <div id="quiz-result" style="display:none"></div>
+      </div>
+
+      <div class="section" id="sec-strecke" style="padding:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 4px">
+          <span style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Nordschleife · Tippe auf Punkt</span>
+          <div style="display:flex;gap:5px">
+            <button onclick="zoomMap(1.5)" style="background:var(--surface);border:0.5px solid var(--border2);border-radius:6px;width:30px;height:30px;font-size:18px;cursor:pointer;color:var(--text);line-height:1">+</button>
+            <button onclick="zoomMap(0.667)" style="background:var(--surface);border:0.5px solid var(--border2);border-radius:6px;width:30px;height:30px;font-size:18px;cursor:pointer;color:var(--text);line-height:1">−</button>
+            <button onclick="resetMap()" style="background:var(--surface);border:0.5px solid var(--border2);border-radius:6px;padding:0 10px;height:30px;font-size:11px;cursor:pointer;color:var(--text)">Reset</button>
+          </div>
+        </div>
+        <div id="strecke-wrap" style="touch-action:none;overflow:hidden;position:relative;border-radius:var(--r-lg);border:0.5px solid var(--border);background:var(--surface2)">
+          <svg id="strecke-svg" style="width:100%;height:auto;display:block;transform-origin:0 0"></svg>
+        </div>
+        <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:6px;padding:0 4px">
+          Pinch zum Zoomen · Ziehen zum Verschieben · Punkt antippen für Details
+        </div>
+      </div>
+
+      <div class="section" id="sec-wetter">
+        <div class="weather-main">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <div><div class="weather-temp">17°</div><div class="weather-desc">Bedeckt · Nürburgring Nordschleife</div></div>
+            <div style="font-size:36px;margin-top:4px">☁️</div>
+          </div>
+          <div class="weather-details">
+            <div><div class="wd-val">74%</div><div class="wd-lbl">Luftfeuchte</div></div>
+            <div><div class="wd-val">24 km/h</div><div class="wd-lbl">Wind SW</div></div>
+            <div><div class="wd-val">18%</div><div class="wd-lbl">Regen</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Stündliche Vorhersage (24h)</div>
+          <div class="hourly" id="hourly"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Streckendetails</div>
+          <div class="w-grid">
+            <div class="wm"><div class="wm-lbl">Asphalt</div><div class="wm-val">31°</div></div>
+            <div class="wm"><div class="wm-lbl">Sichtweite</div><div class="wm-val">7 km</div></div>
+            <div class="wm"><div class="wm-lbl">Taupunkt</div><div class="wm-val">11°</div></div>
+            <div class="wm"><div class="wm-lbl">Luftdruck</div><div class="wm-val">1011 hPa</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+<div style="text-align:center;padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 20px);color:var(--text3);font-size:11px;line-height:1.7">
+  Erdacht &amp; konzipiert von<br>
+  <span style="font-weight:600;color:var(--text2);font-size:12px">derRené81</span>
+</div>
+
+<!-- STRECKE POPUP -->
+<div id="strecke-popup" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center" onclick="closeStreckePopup(event)">
+  <div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 20px);max-height:75vh;overflow-y:auto">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div id="sp-km" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);margin-bottom:3px"></div>
+        <div id="sp-name" style="font-size:18px;font-weight:700;color:var(--text)"></div>
+      </div>
+      <button onclick="closeStreckePopup()" style="background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--text2);flex-shrink:0;margin-left:12px">×</button>
+    </div>
+    <div id="sp-body" style="font-size:13px;color:var(--text);line-height:1.7"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal" class="modal-overlay" style="display:none" onclick="closeEditModal(event)">
+  <div class="modal-box">
+    <div class="modal-title">Ausgabe bearbeiten</div>
+    <div class="modal-row">
+      <select id="edit-who" style="flex:0 0 115px;width:auto"></select>
+      <input type="text" id="edit-desc" placeholder="Beschreibung" style="width:auto;flex:1" />
+    </div>
+    <div class="modal-row">
+      <input type="number" id="edit-amt" placeholder="Betrag €" step="0.01" min="0" style="width:auto;flex:0 0 115px" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-delete-exp" onclick="confirmDelete()" title="Löschen">🗑</button>
+      <button class="btn-cancel" onclick="closeEditModal()">Abbruch</button>
+      <button class="btn-save" onclick="saveEdit()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, push, remove } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBYgq4oKu5Nx50ajyaASOD_oezUK65J-GA",
+  authDomain: "h-green-hell.firebaseapp.com",
+  databaseURL: "https://h-green-hell-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "h-green-hell",
+  storageBucket: "h-green-hell.firebasestorage.app",
+  messagingSenderId: "932558540819",
+  appId: "1:932558540819:web:a8e36a02f605149d9b6fe6"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+
+const PALETTES = [
+  {bg:'#dbeafe',fg:'#1e40af'},{bg:'#dcfce7',fg:'#166534'},
+  {bg:'#fce7f3',fg:'#9d174d'},{bg:'#fef3c7',fg:'#92400e'},
+  {bg:'#ede9fe',fg:'#5b21b6'},
+];
+
+let currentUser = null;
+let currentGroupKey = null;
+let unsubscribe = null;
+let groupSnapshot = null;
+
+function hash(s) { let h=0; for(let i=0;i<s.length;i++) h=Math.imul(31,h)+s.charCodeAt(i)|0; return h.toString(16); }
+function groupKey(name) { return name.toLowerCase().replace(/[^a-z0-9]/g,'_'); }
+
+// Hide loading overlay once Firebase is ready
+document.getElementById('loading-overlay').style.display = 'none';
+document.getElementById('app').style.display = 'flex';
+document.getElementById('app').style.flexDirection = 'column';
+
+// Try auto-login: localStorage (remember me) or sessionStorage
+const savedUser  = localStorage.getItem('ring_user')  || sessionStorage.getItem('ring_user');
+const savedGroup = localStorage.getItem('ring_group') || sessionStorage.getItem('ring_group');
+if (savedUser && savedGroup) {
+  const jUN = document.getElementById('join-username');
+  const jGN = document.getElementById('join-groupname');
+  if (jUN) jUN.value = savedUser;
+  if (jGN) jGN.value = savedGroup;
+  tryAutoLogin(savedUser, savedGroup);
+}
+
+async function tryAutoLogin(user, groupName) {
+  try {
+    const snap = await get(ref(db, 'groups/' + groupKey(groupName)));
+    if (snap.exists()) {
+      currentUser = user;
+      currentGroupKey = groupKey(groupName);
+      enterApp(snap.val());
+    }
+  } catch(e) {}
+}
+
+window.switchTab = function(t) {
+  document.getElementById('tab-join').classList.toggle('active', t==='join');
+  document.getElementById('tab-create').classList.toggle('active', t==='create');
+  document.getElementById('panel-join').style.display = t==='join' ? '' : 'none';
+  document.getElementById('panel-create').style.display = t==='create' ? '' : 'none';
+};
+
+window.createGroup = async function() {
+  const username = document.getElementById('create-username').value.trim();
+  const name = document.getElementById('create-groupname').value.trim();
+  const pw = document.getElementById('create-password').value;
+  const pw2 = document.getElementById('create-password2').value;
+  const err = document.getElementById('create-error');
+  if (!username||!name||!pw) { err.textContent='Bitte alle Felder ausfüllen.'; return; }
+  if (pw !== pw2) { err.textContent='Passwörter stimmen nicht überein.'; return; }
+  const btn = document.getElementById('create-btn');
+  btn.innerHTML='<span class="spinner"></span>Erstellen...'; btn.disabled=true;
+  const key = groupKey(name);
+  try {
+    const snap = await get(ref(db, 'groups/' + key));
+    if (snap.exists()) { err.textContent='Gruppenname bereits vergeben.'; btn.innerHTML='Gruppe erstellen'; btn.disabled=false; return; }
+    const data = { displayName: name, passwordHash: hash(pw), members: { [username]: true }, expenses: {} };
+    await set(ref(db, 'groups/' + key), data);
+    currentUser = username;
+    currentGroupKey = key;
+    sessionStorage.setItem('ring_user', username);
+    sessionStorage.setItem('ring_group', name);
+    if (!localStorage.getItem('ring_user')) {
+      if (confirm('Anmeldedaten im Browser speichern? (Kein erneutes Eintippen nötig)')) {
+        localStorage.setItem('ring_user', username);
+        localStorage.setItem('ring_group', name);
+      }
+    }
+    err.textContent = '';
+    enterApp(data);
+  } catch(e) { err.textContent='Fehler: ' + e.message; }
+  btn.innerHTML='Gruppe erstellen'; btn.disabled=false;
+};
+
+window.joinGroup = async function() {
+  const username = document.getElementById('join-username').value.trim();
+  const name = document.getElementById('join-groupname').value.trim();
+  const pw = document.getElementById('join-password').value;
+  const err = document.getElementById('join-error');
+  if (!username||!name||!pw) { err.textContent='Bitte alle Felder ausfüllen.'; return; }
+  const btn = document.getElementById('join-btn');
+  btn.innerHTML='<span class="spinner"></span>Verbinden...'; btn.disabled=true;
+  const key = groupKey(name);
+  try {
+    const snap = await get(ref(db, 'groups/' + key));
+    if (!snap.exists()) { err.textContent='Gruppe nicht gefunden.'; btn.innerHTML='Beitreten'; btn.disabled=false; return; }
+    const data = snap.val();
+    if (data.passwordHash !== hash(pw)) { err.textContent='Falsches Passwort.'; btn.innerHTML='Beitreten'; btn.disabled=false; return; }
+    await set(ref(db, 'groups/' + key + '/members/' + username), true);
+    currentUser = username;
+    currentGroupKey = key;
+    sessionStorage.setItem('ring_user', username);
+    sessionStorage.setItem('ring_group', name);
+    if (!localStorage.getItem('ring_user')) {
+      if (confirm('Anmeldedaten im Browser speichern? (Kein erneutes Eintippen nötig)')) {
+        localStorage.setItem('ring_user', username);
+        localStorage.setItem('ring_group', name);
+      }
+    }
+    err.textContent = '';
+    enterApp(data);
+  } catch(e) { err.textContent='Fehler: ' + e.message; }
+  btn.innerHTML='Beitreten'; btn.disabled=false;
+};
+
+function enterApp(data) {
+  groupSnapshot = data;
+  document.getElementById('login-view').style.display = 'none';
+  const mv = document.getElementById('main-view');
+  mv.style.display = 'flex';
+  mv.style.flexDirection = 'column';
+  mv.style.flex = '1';
+  mv.style.overflow = 'hidden';
+  document.getElementById('group-bar').style.display = 'flex';
+  document.getElementById('bar-group-name').textContent = '📍 ' + (data.displayName || currentGroupKey);
+  document.getElementById('bar-user-name').textContent = 'Eingeloggt als: ' + currentUser;
+  document.getElementById('sync-indicator').style.display = 'flex';
+  buildWeather();
+  subscribeToGroup();
+}
+
+function subscribeToGroup() {
+  if (unsubscribe) unsubscribe();
+  const groupRef = ref(db, 'groups/' + currentGroupKey);
+  unsubscribe = onValue(groupRef, (snap) => {
+    if (!snap.exists()) return;
+    groupSnapshot = snap.val();
+    rebuildBuyerSelect();
+    renderExpenses();
+  });
+}
+
+window.logout = function() {
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  currentUser = null; currentGroupKey = null; groupSnapshot = null;
+  sessionStorage.removeItem('ring_user');
+  sessionStorage.removeItem('ring_group');
+  localStorage.removeItem('ring_user');
+  localStorage.removeItem('ring_group');
+  document.getElementById('login-view').style.display = '';
+  document.getElementById('main-view').style.display = 'none';
+  document.getElementById('group-bar').style.display = 'none';
+  document.getElementById('sync-indicator').style.display = 'none';
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-kosten').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+};
+
+function rebuildBuyerSelect() {
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const sel = document.getElementById('buyer-sel');
+  const prev = sel.value;
+  sel.innerHTML = members.map(m => `<option${m===currentUser||m===prev?' selected':''}>${m}</option>`).join('');
+  // Also refresh pay-from
+  const payFrom = document.getElementById('pay-from');
+  if (payFrom) payFrom.innerHTML = members.filter(m => m !== currentUser)
+    .map(m => `<option value="${m}">${m}</option>`).join('');
+}
+
+function renderExpenses() {
+  const expObj = groupSnapshot?.expenses || {};
+  const expenses = Object.entries(expObj).map(([id, e]) => ({id, ...e}))
+    .sort((a,b) => (a.ts||0)-(b.ts||0));
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const n = members.length;
+
+  const list = document.getElementById('exp-list');
+  list.innerHTML = expenses.length
+    ? expenses.map(e => `<div class="expense-item">
+        <span class="exp-who">${e.who}</span>
+        <span class="exp-desc">${e.desc}</span>
+        <span class="exp-amount">€ ${parseFloat(e.amount).toFixed(2)}</span>
+        ${e.who===currentUser
+          ? `<button class="edit-btn" onclick="openEditModal('${e.id}')" title="Bearbeiten">✏️</button>`
+          : '<span style="width:26px;display:inline-block"></span>'}
+      </div>`).join('')
+    : '<div style="font-size:13px;color:var(--text2);padding:16px 0;text-align:center">Noch keine Ausgaben</div>';
+
+  document.getElementById('exp-count').textContent = '(' + expenses.length + ')';
+  const total = expenses.reduce((s,e) => s + parseFloat(e.amount), 0);
+  document.getElementById('total-val').textContent = '€ ' + total.toFixed(2);
+  document.getElementById('share-val').textContent = '€ ' + (n > 0 ? total/n : 0).toFixed(2);
+  const payments = Object.values(groupSnapshot?.payments || {});
+  renderAbrechnung(expenses, members, payments);
+  // refresh pay-from dropdown
+  const payFrom = document.getElementById('pay-from');
+  if (payFrom) payFrom.innerHTML = members.filter(m => m !== currentUser)
+    .map(m => `<option value="${m}">${m}</option>`).join('');
+}
+
+window.addPaymentReceived = async function() {
+  const from = document.getElementById('pay-from').value;
+  const amt  = parseFloat(document.getElementById('pay-amt').value);
+  const desc = document.getElementById('pay-desc').value.trim() || 'Zahlung erhalten';
+  if (!from || isNaN(amt) || amt <= 0) { alert('Bitte Person und Betrag angeben.'); return; }
+  // Store as a special "payment" expense: who=from, amount=amt, isPayment=true
+  // This represents: currentUser received money FROM 'from'
+  // In settlement: from pays currentUser directly, so we add it as a payment entry
+  try {
+    await push(ref(db, 'groups/' + currentGroupKey + '/payments'), {
+      from, to: currentUser, amount: amt, desc, ts: Date.now()
+    });
+    document.getElementById('pay-amt').value = '';
+    document.getElementById('pay-desc').value = '';
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+window.addExp = async function() {
+  const who = document.getElementById('buyer-sel').value;
+  const desc = document.getElementById('desc-in').value.trim();
+  const amt = parseFloat(document.getElementById('amt-in').value);
+  if (!desc||isNaN(amt)||amt<=0) return;
+  try {
+    await push(ref(db, 'groups/' + currentGroupKey + '/expenses'), { who, desc, amount: amt, ts: Date.now() });
+    document.getElementById('desc-in').value = '';
+    document.getElementById('amt-in').value = '';
+  } catch(e) { alert('Fehler beim Speichern: ' + e.message); }
+};
+
+window.delExp = async function(id) {
+  try {
+    await remove(ref(db, 'groups/' + currentGroupKey + '/expenses/' + id));
+  } catch(e) { alert('Fehler beim Löschen: ' + e.message); }
+};
+
+let editingId = null;
+
+window.openEditModal = function(id) {
+  const expObj = groupSnapshot?.expenses || {};
+  const e = expObj[id];
+  if (!e) return;
+  editingId = id;
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const whoSel = document.getElementById('edit-who');
+  whoSel.innerHTML = members.map(m => `<option${m===e.who?' selected':''}>${m}</option>`).join('');
+  document.getElementById('edit-desc').value = e.desc;
+  document.getElementById('edit-amt').value = parseFloat(e.amount).toFixed(2);
+  document.getElementById('edit-modal').style.display = 'flex';
+};
+
+window.closeEditModal = function(event) {
+  if (event && event.target !== document.getElementById('edit-modal')) return;
+  document.getElementById('edit-modal').style.display = 'none';
+  editingId = null;
+};
+
+window.saveEdit = async function() {
+  if (!editingId) return;
+  const who = document.getElementById('edit-who').value;
+  const desc = document.getElementById('edit-desc').value.trim();
+  const amt = parseFloat(document.getElementById('edit-amt').value);
+  if (!desc || isNaN(amt) || amt <= 0) return;
+  try {
+    await set(ref(db, 'groups/' + currentGroupKey + '/expenses/' + editingId), {
+      who, desc, amount: amt,
+      ts: groupSnapshot.expenses[editingId].ts || Date.now(),
+      editedAt: Date.now()
+    });
+    document.getElementById('edit-modal').style.display = 'none';
+    editingId = null;
+  } catch(e) { alert('Fehler beim Speichern: ' + e.message); }
+};
+
+window.confirmDelete = async function() {
+  if (!editingId) return;
+  const e = groupSnapshot?.expenses?.[editingId];
+  if (!e) return;
+  if (!confirm(`"${e.desc}" (€ ${parseFloat(e.amount).toFixed(2)}) wirklich löschen?`)) return;
+  try {
+    await remove(ref(db, 'groups/' + currentGroupKey + '/expenses/' + editingId));
+    document.getElementById('edit-modal').style.display = 'none';
+    editingId = null;
+  } catch(err) { alert('Fehler: ' + err.message); }
+};
+
+function calcTransfers(expenses, members, payments) {
+  payments = payments || [];
+  const n = members.length;
+  const total = expenses.reduce((s,e) => s + parseFloat(e.amount), 0);
+  const share = n > 0 ? total/n : 0;
+  const paid = {};
+  members.forEach(m => paid[m] = 0);
+  expenses.forEach(e => { if (members.includes(e.who)) paid[e.who] += parseFloat(e.amount); });
+  // Direct payments: from person paid 'to' person directly
+  // This increases 'from' person's paid amount (they've settled their debt)
+  // and is recorded separately to show in settlement
+  const directPayments = payments.map(p => ({...p, amount: parseFloat(p.amount)}));
+  const bals = members.map(m => {
+    let adj = paid[m] - share;
+    // Add direct payments made by this person (they paid, so less debt)
+    directPayments.filter(p => p.from === m).forEach(p => { adj += p.amount; });
+    // Subtract payments received by this person from others (they got paid)
+    directPayments.filter(p => p.to === m).forEach(p => { adj -= p.amount; });
+    return {name:m, bal:+adj.toFixed(4)};
+  });
+  const d = bals.filter(b=>b.bal<-0.005).map(b=>({...b})).sort((a,b)=>a.bal-b.bal);
+  const c = bals.filter(b=>b.bal>0.005).map(b=>({...b})).sort((a,b)=>b.bal-a.bal);
+  const transfers = [];
+  let di=0,ci=0;
+  while(di<d.length&&ci<c.length){
+    const amt=Math.min(-d[di].bal,c[ci].bal);
+    if(amt>0.005) transfers.push({from:d[di].name,to:c[ci].name,amt:+amt.toFixed(2)});
+    d[di].bal+=amt; c[ci].bal-=amt;
+    if(Math.abs(d[di].bal)<0.005)di++;
+    if(Math.abs(c[ci].bal)<0.005)ci++;
+  }
+  return {total, share, paid, transfers};
+}
+
+function renderAbrechnung(expenses, members, payments) {
+  payments = payments || [];
+  const {total, share, paid, transfers} = calcTransfers(expenses, members, payments);
+  document.getElementById('members-chips').innerHTML = members.map((m,i) => {
+    const p = PALETTES[i % PALETTES.length];
+    return `<div class="member-chip"><div class="member-av" style="background:${p.bg};color:${p.fg}">${m.slice(0,2).toUpperCase()}</div>${m}</div>`;
+  }).join('');
+
+  const container = document.getElementById('all-persons');
+  if (total === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:var(--text2);text-align:center;padding:16px 0">Noch keine Ausgaben eingetragen</div>';
+    return;
+  }
+  container.innerHTML = members.map((person, idx) => {
+    const p = PALETTES[idx % PALETTES.length];
+    const myT = transfers.filter(t => t.from === person);
+    const myExpenses = expenses.filter(e => e.who === person);
+    const bal = paid[person] - share;
+    const chip = bal>0.005
+      ? `<span class="balance-chip chip-pos">+€ ${bal.toFixed(2)}</span>`
+      : bal<-0.005
+      ? `<span class="balance-chip chip-neg">−€ ${Math.abs(bal).toFixed(2)}</span>`
+      : `<span class="balance-chip chip-zero">ausgeglichen</span>`;
+    const myDirect = payments.filter(p => p.from === person || p.to === person);
+    const directHtml = myDirect.length > 0
+      ? myDirect.map(p => {
+          const isPayer = p.from === person;
+          return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;padding:4px 8px;margin-bottom:3px">
+            <span style="font-size:10px;font-weight:600;color:#4a8fd4">${isPayer ? '✓ BEZAHLT' : '✓ ERHALTEN'}</span>
+            <span style="font-size:11px;color:var(--text2)">${isPayer ? 'an '+p.to : 'von '+p.from}</span>
+            <span style="margin-left:auto;font-weight:600;color:#4a8fd4">€ ${parseFloat(p.amount).toFixed(2)}</span>
+          </div>`;
+        }).join('') : '';
+    const myPaymentRows = myT.length > 0
+      ? myT.map(t => `<div class="payment-row">
+          <span style="font-size:11px;color:var(--text2)">zahlt an</span>
+          <span style="color:var(--text2)">→</span>
+          <span>${t.to}</span>
+          <span style="margin-left:auto;font-weight:500">€ ${t.amt.toFixed(2)}</span>
+        </div>`).join('')
+      : bal>0.005
+        ? '<div class="pay-none">empfängt Ausgleich</div>'
+        : '<div class="pay-none">keine Zahlung nötig</div>';
+    const paymentsHtml = directHtml + myPaymentRows;
+
+    const expList = myExpenses.length > 0
+      ? `<div class="exp-breakdown" id="breakdown-${idx}" style="display:none">
+          ${myExpenses.map(e=>`
+            <div class="exp-breakdown-row">
+              <span class="exp-breakdown-desc">${e.desc}</span>
+              <span class="exp-breakdown-amt">€ ${parseFloat(e.amount).toFixed(2)}</span>
+            </div>`).join('')}
+        </div>
+        <button class="exp-toggle-btn" onclick="toggleBreakdown(${idx},this)">
+          ${myExpenses.length} Ausgabe${myExpenses.length!==1?'n':''} anzeigen ▾
+        </button>`
+      : `<div class="pay-none" style="padding-left:0;padding-top:5px">Keine eigenen Ausgaben</div>`;
+
+    return `<div class="person-block">
+      <div class="person-header">
+        <div class="avatar" style="background:${p.bg};color:${p.fg}">${person.slice(0,2).toUpperCase()}</div>
+        <div>
+          <div class="person-name-txt">${person}${person===currentUser?' (du)':''}</div>
+          <div class="person-meta">bezahlt: € ${paid[person].toFixed(2)} · Anteil: € ${share.toFixed(2)}</div>
+        </div>
+        ${chip}
+      </div>
+      ${expList}
+      ${paymentsHtml}
+    </div>`;
+  }).join('');
+}
+
+window.toggleBreakdown = function(idx, btn) {
+  const el = document.getElementById('breakdown-' + idx);
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  const count = btn.textContent.match(/\d+/)[0];
+  btn.textContent = open
+    ? `${count} Ausgabe${count!=='1'?'n':''} anzeigen ▾`
+    : `${count} Ausgabe${count!=='1'?'n':''} ausblenden ▴`;
+};
+
+window.showSec = function(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'wissen') initWissen();
+  if (id === 'wetter') buildWeather();
+  if (id === 'quiz') resetQuizView();
+  if (id === 'strecke') { buildStreckeSVG(); setTimeout(initMapGestures, 100); }
+};
+
+// ── WMO weather code → emoji + label ──
+function wmoIcon(code) {
+  if (code === 0) return ['☀️','Klar'];
+  if (code <= 2)  return ['🌤️','Leicht bewölkt'];
+  if (code === 3) return ['☁️','Bedeckt'];
+  if (code <= 49) return ['🌫️','Nebel'];
+  if (code <= 59) return ['🌦️','Nieselregen'];
+  if (code <= 69) return ['🌧️','Regen'];
+  if (code <= 79) return ['🌨️','Schnee'];
+  if (code <= 82) return ['🌧️','Regenschauer'];
+  if (code <= 84) return ['🌨️','Schneeschauer'];
+  if (code <= 99) return ['⛈️','Gewitter'];
+  return ['🌡️',''];
+}
+
+async function buildWeather() {
+  const hEl = document.getElementById('hourly');
+  const mainTemp = document.querySelector('.weather-temp');
+  const mainDesc = document.querySelector('.weather-desc');
+  // Nürburgring: 50.3356° N, 6.9475° E
+  const url = 'https://api.open-meteo.com/v1/forecast' +
+    '?latitude=50.3356&longitude=6.9475' +
+    '&current=temperature_2m,weathercode,windspeed_10m,winddirection_10m,relative_humidity_2m,precipitation_probability,surface_pressure,apparent_temperature' +
+    '&hourly=temperature_2m,weathercode,precipitation_probability' +
+    '&wind_speed_unit=kmh&timezone=Europe%2FBerlin&forecast_days=2';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    const c = d.current;
+    const [icon, desc] = wmoIcon(c.weathercode);
+    // Wind direction label
+    const dirs = ['N','NO','O','SO','S','SW','W','NW'];
+    const windDir = dirs[Math.round(c.winddirection_10m / 45) % 8];
+    // Update main card
+    mainTemp.textContent = Math.round(c.temperature_2m) + '°';
+    mainDesc.textContent = desc + ' · Nürburgring Nordschleife';
+    document.querySelector('.weather-main .weather-details').innerHTML =
+      '<div><div class="wd-val">' + c.relative_humidity_2m + '%</div><div class="wd-lbl">Luftfeuchte</div></div>' +
+      '<div><div class="wd-val">' + Math.round(c.windspeed_10m) + ' km/h</div><div class="wd-lbl">Wind ' + windDir + '</div></div>' +
+      '<div><div class="wd-val">' + (c.precipitation_probability || 0) + '%</div><div class="wd-lbl">Regen</div></div>';
+    // Streckendetails
+    const detailEls = document.querySelectorAll('.wm-val');
+    if (detailEls.length >= 4) {
+      detailEls[0].textContent = Math.round(c.temperature_2m * 1.5 + 5) + '°';  // rough asphalt estimate
+      detailEls[1].textContent = '—';  // visibility not in free API
+      detailEls[2].textContent = Math.round(c.apparent_temperature) + '°';
+      detailEls[3].textContent = Math.round(c.surface_pressure) + ' hPa';
+    }
+    // Hourly forecast: next 24 hours
+    hEl.innerHTML = '';
+    const now = new Date();
+    const times = d.hourly.time;
+    const temps = d.hourly.temperature_2m;
+    const codes = d.hourly.weathercode;
+    const probs = d.hourly.precipitation_probability;
+    let shown = 0;
+    for (let i = 0; i < times.length && shown < 24; i++) {
+      const t = new Date(times[i]);
+      if (t < now - 1800000) continue;
+      const [ic] = wmoIcon(codes[i]);
+      const label = shown === 0 ? 'Jetzt'
+        : t.getHours() + ':00';
+      hEl.innerHTML += '<div class="hour-item">' +
+        '<div class="hour-time">' + label + '</div>' +
+        '<div class="hour-icon">' + ic + '</div>' +
+        '<div class="hour-temp">' + Math.round(temps[i]) + '°</div>' +
+        '<div class="hour-rain">' + (probs[i] || 0) + '%</div>' +
+        '</div>';
+      shown++;
+    }
+    // Emoji in main card
+    document.querySelector('.weather-main > div > div:last-child').textContent = icon;
+  } catch(e) {
+    mainDesc.textContent = 'Wetterdaten konnten nicht geladen werden';
+    console.warn('Weather error:', e);
+  }
+}
+
+// ─── STRECKE ────────────────────────────────────────────────────
+const ABSCHNITTE = [
+  { id:'start',      name:'Start / Ziel',          km:'0,0 km',
+    info:'Der Start-Ziel-Bereich befindet sich auf dem Grandprix-Kurs. Beim 24h-Rennen starten über 150 Fahrzeuge gleichzeitig – das Gedränge in der ersten Runde ist enorm. Fahrzeuge aus hinteren Startpositionen müssen schon hier taktisch agieren, ohne Kontakt zu riskieren. Für Fahrer gilt: Ruhe bewahren, Position halten, erste Runde überstehen.' },
+  { id:'hatzenbach',  name:'Hatzenbach',             km:'~1,5 km',
+    info:'Eine der schnellsten und technisch anspruchsvollsten Abschnitte gleich zu Beginn. Eine Folge von schnellen Rechtskurven in leichtem Gefälle. Fahrzeuge sind hier auf über 200 km/h. Blinde Einlenkpunkte und Bodenwellen machen das Bremspunkt-Finden schwierig. Fehler werden hier sofort mit Streckenkontakt bestraft.' },
+  { id:'hocheimbach', name:'Hocheimbach',            km:'~2,8 km',
+    info:'Hocheimbach ist ein schneller, langgezogener Bereich mit leichten Bodenwellen. Fahrzeuge sind voll beschleunigt. Das Auto wird durch Bodenwellen "leicht" – Fahrer müssen das Lenkrad locker halten, um nicht gegenzusteuern und den Wagen zu destabilisieren. Hohe Konzentration trotz scheinbar unkritischer Streckenführung.' },
+  { id:'schwedenkreuz', name:'Schwedenkreuz',        km:'~4,2 km',
+    info:'Eine der schnellsten Kurven der Nordschleife – GT3-Fahrzeuge nehmen sie mit fast Vollgas. Die Kurve ist leicht überhöht und hat einen blinden Scheitelpunkt. Der Randstein auf der Innenseite ist tückisch: Zu viel drüber, und das Fahrzeug wird destabilisiert. Fahrerfehler hier führen direkt in die Leitplanke.' },
+  { id:'aremberg',    name:'Aremberg',               km:'~5,1 km',
+    info:'Eine enge, sehr schnelle Rechtskurve nach einer langen Geraden. Bremszone von über 200 km/h auf unter 100 km/h in wenigen Metern. Die Kurve wird in Kuppe eingelenkt – der Fahrer sieht den Scheitelpunkt erst sehr spät. Überbremsung führt zum Untersteuern geradeaus in die Leitplanke. Ein klassischer Angstpunkt.' },
+  { id:'fuchsroehre',  name:'Fuchsröhre',            km:'~6,0 km',
+    info:'Die Fuchsröhre ist eine lange, leicht geschwungene Gefällestrecke durch den Wald. Fahrzeuge erreichen hier über 250 km/h. Das Fahrzeug wird durch das Gefälle entlastet – es entsteht ein leichter Abhebeffekt. Bei Nässe oder Laub auf der Strecke ist diese Passage extrem rutschig. Volle Konzentration auf Spurhaltung.' },
+  { id:'adenauer',    name:'Adenauer Forst',         km:'~7,5 km',
+    info:'Eine Reihe von Kurven durch dichten Wald, die großes Rhythmusgefühl verlangen. Die Strecke verläuft eng durch den Baumbestand – Fehler haben keinen Auslauf. Besonders bei wechselnden Lichtverhältnissen (Schatten/Sonne) schwer zu fahren. Die Bremsmarken können durch Laub verdeckt sein.' },
+  { id:'metzgesfeld', name:'Metzgesfeld',            km:'~8,8 km',
+    info:'Ein schneller, wellenförmiger Abschnitt. Fahrer müssen mit dem Fahrzeug "mitschwingen" – zu harte Lenkeingriffe destabilisieren das Auto über Kuppen. Das richtige Maß an Aktivität am Lenkrad ist hier der Schlüssel. Besonders für schwere GT3-Fahrzeuge technisch fordernd.' },
+  { id:'kallenhard',  name:'Kallenhard',             km:'~9,6 km',
+    info:'Eine schnelle Rechts-Links-Kombination mit Streckeneinfädlung. Fahrer werden durch Fliehkräfte stark beansprucht. Die Übergänge zwischen den Kurven müssen fließend sein – ruckartiges Umlenken bringt das Heck zum Ausbrechen. Bei Nässe ist Kallenhard eine der ersten Stellen, wo Fahrzeuge abfliegen.' },
+  { id:'wehrseifen',  name:'Wehrseifen',             km:'~11,0 km',
+    info:'Eine enge, langsame Haarnadelkurve in einem Tal. Nach langer Vollgaspassage müssen Fahrer stark bremsen. Die Strecke läuft ins Tal hinunter – das Fahrzeug wird beim Einlenken durch das Gefälle gedrückt. Perfekter Bremspunkt und frühes Einlenken sind entscheidend für eine schnelle Ausfahrt.' },
+  { id:'exmuehle',   name:'Ex-Mühle',               km:'~11,8 km',
+    info:'Eine langsame, enge Linkskurve direkt nach Wehrseifen. Fahrer müssen hier das Fahrzeug komplett kontrollieren – kein Grip von der Strecke, eng zwischen Mauern. Ein beliebter Punkt für Randstein-Nutzung, die jedoch das Fahrzeug leicht machen kann. Sauberkeit im Fahrstil ist hier Pflicht.' },
+  { id:'bergwerk',   name:'Bergwerk',                km:'~13,0 km',
+    info:'Bergwerk ist eine schnelle, geteilte Kurve in der Streckenmitte. Das Fahrzeug ist voll beladen durch die Fliehkraft. Präzises Einlenken und frühe Gaspflege sind nötig. Ein Abflug hier bedeutet langen Weg durch den Kies – klassische Unfallstelle beim 24h-Rennen, besonders nachts bei Dunkelheit.' },
+  { id:'kesselchen',  name:'Kesselchen',             km:'~14,2 km',
+    info:'Ein langer, geschwungener Abschnitt in einer Mulde (daher "Kesselchen"). Das Fahrzeug wird durch die Kurvenkombination stark beansprucht. Besonderheit: Durch die Tallage sammelt sich hier Nebel – beim 24h-Rennen nachts oft die Stelle mit der schlechtesten Sicht. Orientierung nur über Randsteine und Fahrzeuglichter.' },
+  { id:'klostertal',  name:'Klostertal',             km:'~15,0 km',
+    info:'Ein schneller Abschnitt durch ein enges Tal. Wenig Auslauf, enge Bäume beidseitig. Fahrer müssen dem Rhythmus des Kurvenverlaufs folgen – zu früh einlenken führt zur Schikane. Beim Qualifyingrun kämpfen Fahrer hier um jede Zehntelsekunde.' },
+  { id:'karussell',   name:'Caracciola-Karussell',   km:'~15,9 km',
+    info:'Das bekannteste Hindernis der Nordschleife: Eine überhöhte Linkskurve mit einem betonierten Rinnenbereich. Fahrer können mit den Innenrädern in die Betonrinne fahren – dies erzeugt maximale Kurvengeschwindigkeit durch mechanischen Grip. Das Einfahren erfordert präzise Dosierung. Zu früh rein: Schlag auf den Boden. Zu spät: Zeitverlust.' },
+  { id:'hoheacht',   name:'Hohe Acht',               km:'~16,8 km',
+    info:'Der höchste Punkt der Nordschleife (617 m ü.NN). Nach dem Karussell geht es steil bergauf zu einer schnellen Rechtskurve. Das Fahrzeug ist auf der Kuppe kurz leicht – Fahrer müssen den Abtrieb aktiv halten. Bei Seitenwind am Kamm kann das Fahrzeug zur Seite gedrückt werden. Fantastische Aussicht, aber kein Moment zum Entspannen.' },
+  { id:'wippermann', name:'Wippermann',              km:'~17,5 km',
+    info:'Eine schnelle Kurvenfolge nach der Hohen Acht. Das Fahrzeug läuft steil bergab durch mehrere Rechtskurven. Unter Vollgas muss der Fahrer dem Streckenrand eng folgen. Bodenwellen lassen das Auto "hüpfen" – präzise Lenkung und Ruhe sind nötig. Fehler führen direkt in die Leitplanken ohne Auslaufzone.' },
+  { id:'bruennchen',  name:'Brünnchen',              km:'~18,8 km',
+    info:'Eine der beliebtesten Zuschauerkurven – und für Fahrer eine der schwierigsten. Eine mittelschnelle Rechtskurve nach einer Kuppe: Der Einlenkpunkt ist blind. Wer zu spät einlenkt, fährt geradeaus über die Strecke. Beim 24h-Rennen brechen hier viele Fahrzeuge ab. Das Camping-Areal Brünnchen direkt daneben ist legendär.' },
+  { id:'eiskurve',   name:'Eiskurve',                km:'~19,6 km',
+    info:'Eine enge, langsame Linkskurve – im Winter oft vereist (daher der Name). Fahrer müssen stark bremsen und präzise einlenken. Die Kurve liegt im Schatten des Waldes und trocknet langsam. Bei Rennen mit wechselnder Witterung ist sie oft noch nass, wenn der Rest der Strecke schon trocken ist.' },
+  { id:'pflanzgarten', name:'Pflanzgarten',          km:'~20,2 km',
+    info:'Einer der gefürchtetsten Abschnitte: Pflanzgarten 1 und 2 sind schnelle Kurven mit einem riesigen Sprung dazwischen. Fahrzeuge heben hier komplett ab – GT3-Autos fliegen mehrere Meter weit durch die Luft. Beim Aufsetzen muss das Fahrzeug sofort stabil gehalten werden. Ein falsches Zucken am Lenkrad beim Aufsetzen endet fast immer im Abflug.' },
+  { id:'schwalbenschwanz', name:'Schwalbenschwanz',  km:'~21,5 km',
+    info:'Eine elegante, schnelle S-Kurve. Der Name kommt vom schwalbenartigen Verlauf der Streckenführung. Fahrer müssen fließend von Links nach Rechts wechseln – ruckartige Bewegungen destabilisieren das Heck. Ein ästhetisch schöner, aber fahrerisch anspruchsvoller Abschnitt.' },
+  { id:'galgenkopf',  name:'Galgenkopf',             km:'~22,8 km',
+    info:'Eine enge Schikane kurz vor der Döttinger Höhe. Fahrer müssen stark verzögern und das Fahrzeug sauber durch einen Richtungswechsel führen. Die Curbs sind aggressiv – zu viel drüber führt zu Reifenschäden. Ein guter Exit aus dem Galgenkopf ist entscheidend für die Höchstgeschwindigkeit auf der folgenden Geraden.' },
+  { id:'doettinger',  name:'Döttinger Höhe',         km:'~23,5 km',
+    info:'Die längste Gerade der Nordschleife – hier erreichen GT3-Fahrzeuge über 280 km/h, LMP-Fahrzeuge sogar über 300 km/h. Für Fahrer ist es eine kurze Erholungsphase, aber auch ein Moment der Aufmerksamkeit: Auf der Geraden werden Überholmanöver eingeleitet, und Reifenschäden oder technische Probleme werden hier am schnellsten gefährlich.' },
+  { id:'antoniusbuche', name:'Antoniusbuche',        km:'~24,5 km',
+    info:'Die letzte enge Passage vor dem Rückweg auf den Grandprix-Kurs. Eine langsame Linkskurve, die Fahrer nach einem langen Rennen noch volle Konzentration abverlangt. Müdigkeit beim 24h-Rennen ist hier ein echter Faktor – Fahrerwechsel vor dieser Passage können taktisch sinnvoll sein.' },
+  { id:'tiergarten',  name:'Tiergarten',             km:'~25,0 km',
+    info:'Der letzte Abschnitt vor Start/Ziel. Eine schnelle Passage mit leichten Kurven, die auf den Grandprix-Kurs zurückführt. Fahrer sind hier bereits im "Abschluss-Modus" – volle Pace für eine schnelle Runde oder taktisch für einen Boxenstopp positionieren. Der Tunnel unter der Tribüne ist ein besonderes Erlebnis.' },
+  { id:'dunlop',      name:'Dunlop-Kehre',            km:'GP-Kurs',
+    info:'Die Dunlop-Kehre ist eine enge, langsame Rechtskurve im GP-Kurs am tiefsten Punkt der Strecke. Benannt nach dem Reifenhersteller Dunlop. Fahrer müssen von der Geraden kommend stark verzögern – ein präziser Bremspunkt ist entscheidend, da das Fahrzeug auf dem Gefälle zur Kurve hin dazu neigt, überzubremsen. Der Ausgang der Kurve bestimmt die Beschleunigung zurück auf die Gerade. Beim 24h-Rennen ist dies auch ein beliebter Überholpunkt, da die Bremszonen gut zu verteidigen sind.' },
+];
+
+function buildStreckeSVG() {
+  var svg = document.getElementById("strecke-svg");
+  if (svg.innerHTML) return;
+  svg.setAttribute("viewBox", "0 0 971 801");
+  svg.style.width = "100%";
+  svg.style.height = "auto";
+  svg.style.display = "block";
+  var isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var bg  = isDark ? "#111118" : "#eceae4";
+  var RED = "#e24b4a";
+  var BLU = "#4a8fd4";
+  var B64 = "data:image/png;base64,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";
+  var h = "";
+  h += "<rect width=\"971\" height=\"801\" fill=\"" + bg + "\"/>";
+  if (isDark) {
+    h += "<image href=\"" + B64 + "\" x=\"0\" y=\"0\" width=\"971\" height=\"801\"/>";
+  } else {
+    h += "<filter id=\"inv\"><feColorMatrix type=\"matrix\" values=\"-1 0 0 0 0.28  0 -1 0 0 0.28  0 0 -1 0 0.3  0 0 0 1 0\"/></filter>";
+    h += "<image href=\"" + B64 + "\" x=\"0\" y=\"0\" width=\"971\" height=\"801\" filter=\"url(#inv)\"/>";
+  }
+  h += "<circle cx=\"385\" cy=\"548\" r=\"14\" fill=\"" + RED + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;start&apos;)\"/>";
+  h += "<text x=\"417\" y=\"554\" text-anchor=\"start\" font-size=\"20\" font-weight=\"700\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;start&apos;)\">Start / Ziel</text>";
+  h += "<circle cx=\"337\" cy=\"496\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hatzenbach&apos;)\"/>";
+  h += "<text x=\"309\" y=\"502\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hatzenbach&apos;)\">Hatzenbach</text>";
+  h += "<circle cx=\"240\" cy=\"380\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;schwedenkreuz&apos;)\"/>";
+  h += "<text x=\"212\" y=\"386\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;schwedenkreuz&apos;)\">Schwedenkreuz</text>";
+  h += "<circle cx=\"192\" cy=\"412\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;aremberg&apos;)\"/>";
+  h += "<text x=\"164\" y=\"418\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;aremberg&apos;)\">Aremberg</text>";
+  h += "<circle cx=\"217\" cy=\"312\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;fuchsroehre&apos;)\"/>";
+  h += "<text x=\"189\" y=\"318\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;fuchsroehre&apos;)\">Fuchsröhre</text>";
+  h += "<circle cx=\"201\" cy=\"268\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;adenauer&apos;)\"/>";
+  h += "<text x=\"173\" y=\"274\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;adenauer&apos;)\">Adenauer Forst</text>";
+  h += "<circle cx=\"190\" cy=\"208\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;metzgesfeld&apos;)\"/>";
+  h += "<text x=\"162\" y=\"214\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;metzgesfeld&apos;)\">Metzgesfeld</text>";
+  h += "<circle cx=\"225\" cy=\"174\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kallenhard&apos;)\"/>";
+  h += "<text x=\"197\" y=\"180\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kallenhard&apos;)\">Kallenhard</text>";
+  h += "<circle cx=\"294\" cy=\"134\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wehrseifen&apos;)\"/>";
+  h += "<text x=\"266\" y=\"140\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wehrseifen&apos;)\">Wehrseifen</text>";
+  h += "<circle cx=\"335\" cy=\"92\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;exmuehle&apos;)\"/>";
+  h += "<text x=\"307\" y=\"98\" text-anchor=\"end\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;exmuehle&apos;)\">Exmühle</text>";
+  h += "<circle cx=\"489\" cy=\"78\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bergwerk&apos;)\"/>";
+  h += "<text x=\"517\" y=\"84\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bergwerk&apos;)\">Bergwerk</text>";
+  h += "<circle cx=\"546\" cy=\"120\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kesselchen&apos;)\"/>";
+  h += "<text x=\"574\" y=\"126\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;kesselchen&apos;)\">Kesselchen</text>";
+  h += "<circle cx=\"605\" cy=\"119\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;klostertal&apos;)\"/>";
+  h += "<text x=\"633\" y=\"125\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;klostertal&apos;)\">Klostertal</text>";
+  h += "<circle cx=\"648\" cy=\"174\" r=\"14\" fill=\"" + RED + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;karussell&apos;)\"/>";
+  h += "<text x=\"680\" y=\"180\" text-anchor=\"start\" font-size=\"20\" font-weight=\"700\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;karussell&apos;)\">Karussell</text>";
+  h += "<circle cx=\"708\" cy=\"114\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hoheacht&apos;)\"/>";
+  h += "<text x=\"736\" y=\"120\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;hoheacht&apos;)\">Hohe Acht</text>";
+  h += "<circle cx=\"798\" cy=\"164\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wippermann&apos;)\"/>";
+  h += "<text x=\"826\" y=\"170\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;wippermann&apos;)\">Wippermann</text>";
+  h += "<circle cx=\"810\" cy=\"167\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bruennchen&apos;)\"/>";
+  h += "<text x=\"838\" y=\"173\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;bruennchen&apos;)\">Brünnchen</text>";
+  h += "<circle cx=\"773\" cy=\"218\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;eiskurve&apos;)\"/>";
+  h += "<text x=\"801\" y=\"224\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;eiskurve&apos;)\">Eiskurve</text>";
+  h += "<circle cx=\"735\" cy=\"258\" r=\"14\" fill=\"" + RED + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;pflanzgarten&apos;)\"/>";
+  h += "<text x=\"767\" y=\"264\" text-anchor=\"start\" font-size=\"20\" font-weight=\"700\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;pflanzgarten&apos;)\">Pflanzgarten</text>";
+  h += "<circle cx=\"690\" cy=\"295\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;schwalbenschwanz&apos;)\"/>";
+  h += "<text x=\"718\" y=\"301\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;schwalbenschwanz&apos;)\">Schwalbenschwanz</text>";
+  h += "<circle cx=\"714\" cy=\"360\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;galgenkopf&apos;)\"/>";
+  h += "<text x=\"742\" y=\"366\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;galgenkopf&apos;)\">Galgenkopf</text>";
+  h += "<circle cx=\"590\" cy=\"400\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;doettinger&apos;)\"/>";
+  h += "<text x=\"618\" y=\"406\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;doettinger&apos;)\">Döttinger Höhe</text>";
+  h += "<circle cx=\"480\" cy=\"462\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;tiergarten&apos;)\"/>";
+  h += "<text x=\"508\" y=\"468\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;tiergarten&apos;)\">Tiergarten</text>";
+  h += "<circle cx=\"510\" cy=\"442\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;antoniusbuche&apos;)\"/>";
+  h += "<text x=\"538\" y=\"448\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;antoniusbuche&apos;)\">Antoniusbuche</text>";
+  h += "<circle cx=\"279\" cy=\"706\" r=\"10\" fill=\"" + BLU + "\" stroke=\"white\" stroke-width=\"3\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;dunlop&apos;)\"/>";
+  h += "<text x=\"307\" y=\"712\" text-anchor=\"start\" font-size=\"20\" font-weight=\"600\" fill=\"white\" font-family=\"-apple-system,BlinkMacSystemFont,sans-serif\" style=\"cursor:pointer\" onclick=\"openStreckePopup(&apos;dunlop&apos;)\">Dunlop-Kehre</text>";
+  svg.innerHTML = h;
+}
+
+window.openStreckePopup = function(id) {
+  const ab = ABSCHNITTE.find(a=>a.id===id);
+  if(!ab) return;
+  document.getElementById('sp-km').textContent = ab.km;
+  document.getElementById('sp-name').textContent = ab.name;
+  document.getElementById('sp-body').textContent = ab.info;
+  document.getElementById('strecke-popup').style.display = 'flex';
+};
+
+window.closeStreckePopup = function(event) {
+  if(event && event.target !== document.getElementById('strecke-popup')) return;
+  document.getElementById('strecke-popup').style.display = 'none';
+};
+
+// ─── ZOOM & PAN ──────────────────────────────────────────────────
+let mapScale = 1, mapX = 0, mapY = 0;
+let isPanning = false, startX = 0, startY = 0, startMapX = 0, startMapY = 0;
+let pinchStartDist = 0, pinchStartScale = 1;
+
+function applyMapTransform() {
+  const svg = document.getElementById('strecke-svg');
+  if (!svg) return;
+  // Clamp
+  const wrap = document.getElementById('strecke-wrap');
+  const ww = wrap ? wrap.clientWidth : 300;
+  const wh = wrap ? wrap.clientHeight : 200;
+  const sw = svg.clientWidth * mapScale;
+  const sh = svg.clientHeight * mapScale;
+  mapX = Math.min(0, Math.max(ww - sw, mapX));
+  mapY = Math.min(0, Math.max(wh - sh, mapY));
+  svg.style.transform = `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+}
+
+window.zoomMap = function(factor) {
+  const wrap = document.getElementById('strecke-wrap');
+  if (!wrap) return;
+  const cx = wrap.clientWidth / 2;
+  const cy = wrap.clientHeight / 2;
+  const newScale = Math.min(6, Math.max(1, mapScale * factor));
+  mapX = cx - (cx - mapX) * (newScale / mapScale);
+  mapY = cy - (cy - mapY) * (newScale / mapScale);
+  mapScale = newScale;
+  applyMapTransform();
+};
+
+window.resetMap = function() {
+  mapScale = 1; mapX = 0; mapY = 0;
+  applyMapTransform();
+};
+
+function initMapGestures() {
+  const wrap = document.getElementById('strecke-wrap');
+  if (!wrap || wrap._gesturesInit) return;
+  wrap._gesturesInit = true;
+
+  // Touch pinch + pan
+  let touches = [];
+  wrap.addEventListener('touchstart', e => {
+    touches = Array.from(e.touches);
+    if (touches.length === 1) {
+      isPanning = true;
+      startX = touches[0].clientX; startY = touches[0].clientY;
+      startMapX = mapX; startMapY = mapY;
+    } else if (touches.length === 2) {
+      isPanning = false;
+      pinchStartDist = Math.hypot(touches[0].clientX-touches[1].clientX, touches[0].clientY-touches[1].clientY);
+      pinchStartScale = mapScale;
+    }
+  }, {passive:true});
+
+  wrap.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = Array.from(e.touches);
+    if (t.length === 1 && isPanning) {
+      mapX = startMapX + (t[0].clientX - startX);
+      mapY = startMapY + (t[0].clientY - startY);
+      applyMapTransform();
+    } else if (t.length === 2) {
+      const dist = Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+      const cx = (t[0].clientX + t[1].clientX) / 2;
+      const cy = (t[0].clientY + t[1].clientY) / 2;
+      const rect = wrap.getBoundingClientRect();
+      const px = cx - rect.left, py = cy - rect.top;
+      const newScale = Math.min(6, Math.max(1, pinchStartScale * dist / pinchStartDist));
+      mapX = px - (px - mapX) * (newScale / mapScale);
+      mapY = py - (py - mapY) * (newScale / mapScale);
+      mapScale = newScale;
+      applyMapTransform();
+    }
+  }, {passive:false});
+
+  wrap.addEventListener('touchend', () => { isPanning = false; }, {passive:true});
+
+  // Mouse pan (desktop)
+  wrap.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    isPanning = true;
+    startX = e.clientX; startY = e.clientY;
+    startMapX = mapX; startMapY = mapY;
+    wrap.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isPanning) return;
+    mapX = startMapX + (e.clientX - startX);
+    mapY = startMapY + (e.clientY - startY);
+    applyMapTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    isPanning = false;
+    if (wrap) wrap.style.cursor = 'grab';
+  });
+  wrap.style.cursor = 'grab';
+
+  // Scroll wheel zoom
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const px = e.clientX - rect.left, py = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.15 : 0.87;
+    const newScale = Math.min(6, Math.max(1, mapScale * factor));
+    mapX = px - (px - mapX) * (newScale / mapScale);
+    mapY = py - (py - mapY) * (newScale / mapScale);
+    mapScale = newScale;
+    applyMapTransform();
+  }, {passive:false});
+}
+const WISSEN = [
+  {
+    id:'geschichte', icon:'📜', label:'Geschichte', sub:'Seit 1927',
+    title:'Geschichte der Nordschleife',
+    facts:[
+      {label:'Entstehung', text:'Die Nürburgring-Nordschleife wurde am 18. Juni 1927 eröffnet. Der Bau begann 1925 als Arbeitsbeschaffungsmaßnahme für die strukturschwache Eifelregion – rund 2.500 Arbeiter waren beteiligt.'},
+      {label:'Baukosten & Zeit', hl:'15 Monate', text:'In nur 15 Monaten Bauzeit entstanden 25,378 km Rennstrecke durch die Eifel. Die Gesamtkosten beliefen sich auf rund 14 Millionen Reichsmark.'},
+      {label:'Zweiter Weltkrieg', text:'Während des Zweiten Weltkriegs wurde die Strecke als Militärgelände genutzt. Nach dem Krieg wurde sie von den Alliierten gesperrt, 1947 aber wieder für den Rennsport freigegeben.'},
+      {label:'Umbau 1967–1970', text:'In den späten 1960er Jahren wurde die Strecke umfangreich modernisiert: Leitplanken, Notausgänge und verbesserte Streckenposten wurden eingeführt. Dennoch blieb die Nordschleife gefährlich.'},
+      {label:'Der Grand Prix verlässt die Nordschleife', text:'Nach dem schweren Unfall von Niki Lauda beim Formel-1-Grand-Prix 1976 wurden keine weiteren Formel-1-Rennen auf der Nordschleife ausgetragen. Die Strecke galt als nicht mehr vertretbar sicher für die Königsklasse.'},
+      {label:'Heute', text:'Heute ist die Nordschleife öffentlich befahrbar (Touristenfahrten) und Austragungsort zahlreicher Rennen, darunter das berühmte 24h-Rennen und die Nürburgring Langstrecken-Serie (NLS).'},
+    ]
+  },
+  {
+    id:'strecke', icon:'🗺️', label:'Die Strecke', sub:'25,378 km · 73 Kurven',
+    title:'Streckenprofil Nordschleife',
+    facts:[
+      {label:'Länge & Kurven', hl:'25,378 km', text:'Die Nordschleife ist 25,378 km lang und hat 73 Kurven (33 Links, 40 Rechts). Für das 24h-Rennen wird sie mit dem GP-Kurs kombiniert – die Gesamtlänge beträgt dann rund 25,378 km (nur Nordschleife).'},
+      {label:'Höhenunterschied', hl:'300 m', text:'Der Höhenunterschied zwischen dem tiefsten und höchsten Punkt der Strecke beträgt rund 300 Meter. Der höchste Punkt ist die Hohe Acht auf 617 m ü. NN, der tiefste liegt am Breidscheid.'},
+      {label:'Bekannte Abschnitte', text:'Flugplatz, Hatzenbach, Hocheimbach, Schwedenkreuz, Aremberg, Fuchsröhre, Adenauer Forst, Metzgesfeld, Kallenhard, Wehrseifen, Breidscheid, Ex-Mühle, Lauda-Links, Bergwerk, Kesselchen, Klostertal, Caracciola-Karussell, Hohe Acht, Wippermann, Eschbach, Brünnchen, Eiskurve, Pflanzgarten, Sprunghügel, Schwalbenschwanz, Steilstrecke, Döttinger Höhe, Tiergarten, Antoniusbuche, Galgenkopf.'},
+      {label:'Rekordrundenzeit', hl:'5:19.546 min', text:'Den offiziellen Rundenrekord für Serienfahrzeuge hält der Porsche 911 GT2 RS MR mit 6:43.300 min (2018). Der Gesamtrekord auf der Nordschleife wurde 2018 von einem Porsche 919 Hybrid Evo mit 5:19.546 min aufgestellt.'},
+      {label:'Charakteristika', text:'Die Strecke gilt als eine der anspruchsvollsten der Welt. Blinde Kuppen, enge Kurven, starke Höhenunterschiede und wechselnde Wetterbedingungen auf verschiedenen Streckenteilen machen sie zur ultimativen Herausforderung.'},
+    ]
+  },
+  {
+    id:'karussell', icon:'🔄', label:'Karussell', sub:'Ikone der Nordschleife',
+    title:'Das Caracciola-Karussell',
+    facts:[
+      {label:'Was ist das Karussell?', text:'Das Caracciola-Karussell ist eine der bekanntesten Kurven der Welt – eine überhöhte Linkskurve mit einem Betonbett im Inneren. Fahrer fahren mit zwei Rädern in der Betonrinne, um Bodenhaftung zu gewinnen.'},
+      {label:'Namensgeber', text:'Die Kurve ist nach Rudolf Caracciola benannt, einem deutschen Rennfahrer der 1930er Jahre, der als einer der Ersten die Rinne nutzte, um schneller durch die Kurve zu kommen.'},
+      {label:'Überhöhung', hl:'32°', text:'Das Betonbett ist um etwa 32 Grad geneigt. Die Rinne verlangsamt das Fahrzeug zunächst, bietet aber maximale Seitenkraft und ermöglicht ein frühes Herausbeschleunigen.'},
+      {label:'Taktik', text:'Ob man ins Karussell einfährt oder es umfährt, ist eine Taktikentscheidung. Beim 24h-Rennen fahren die meisten GT-Fahrzeuge in die Rinne, da dies bei den Rundenzeiten entscheidende Zehntelsekunden spart.'},
+      {label:'Kleines Karussell', text:'Etwas weiter auf der Strecke gibt es auch das "Kleine Karussell" – ein ähnliches Betonbett, aber weniger weitläufig. Es ist ebenfalls eine der tückischen Stellen der Nordschleife.'},
+    ]
+  },
+  {
+    id:'24h', icon:'🏆', label:'24h-Rennen', sub:'Das Vollgas-Festival',
+    title:'Das 24h-Rennen am Nürburgring',
+    facts:[
+      {label:'Geschichte', text:'Das 24h-Rennen am Nürburgring wurde 1970 zum ersten Mal ausgetragen. Es startete als kleines Clubrennen und wuchs über die Jahrzehnte zu einem der größten Motorsport-Events der Welt.'},
+      {label:'Starterfeld', hl:'150+ Fahrzeuge', text:'Beim 24h-Rennen gehen über 150 Fahrzeuge gleichzeitig an den Start – von GT3-Rennwagen bis zu straßennahen Serienfahrzeugen. Das macht es zu einem der größten Rennen der Welt nach Fahrzeuganahl.'},
+      {label:'Klassen', text:'Das Rennen umfasst zahlreiche Klassen: SP9 (GT3), SP-Pro, SP-X, SP10, SP11 sowie viele produktionsnahe Klassen wie SP3, SP4, SP6 und die VLN-Klassen. Jeder kann mitmachen – auch Amateurfahrer.'},
+      {label:'Besucherrekord', hl:'220.000', text:'An Spitzenwochenenden kommen bis zu 220.000 Zuschauer an die Nordschleife – Camping inklusive. Die Atmosphäre ist legendär: Bonfires in der Nacht, Fahrzeuge die um 3 Uhr morgens durch den Nebel donnern.'},
+      {label:'2026', text:'Das 24h-Rennen 2026 (ADAC RAVENOL 24h Nürburgring) findet vom 14. bis 17. Mai 2026 statt. Erstmals nimmt Formel-1-Weltmeister Max Verstappen teil.'},
+    ]
+  },
+  {
+    id:'gruenehoelle', icon:'🌿', label:'Grüne Hölle', sub:'Der Spitzname',
+    title:'Die Grüne Hölle',
+    facts:[
+      {label:'Woher kommt der Name?', text:'Der Begriff "Grüne Hölle" wurde von Formel-1-Fahrer Jackie Stewart geprägt, der die Nordschleife in den 1960er und 70er Jahren fuhr. Er bezeichnete die Strecke als "Green Hell" wegen der dichten Wälder, des unberechenbaren Wetters und der extremen Gefährlichkeit.'},
+      {label:'Wetter', text:'Das Wetter in der Eifel ist berüchtigt: Auf einem einzigen Rundkurs können gleichzeitig Sonnenschein, Nebel, Regen und sogar Schnee herrschen – je nach Höhenlage und Tageszeit. Das macht jede Runde zu einer eigenen Herausforderung.'},
+      {label:'Vegetation', text:'Die Strecke schlängelt sich durch dichten Eifelwald. Der Name "Grüne Hölle" ist also buchstäblich: Das satte Grün der Bäume kontrastiert mit der Dramatik und Gefährlichkeit der Strecke.'},
+      {label:'Mythos', text:'Die Nordschleife ist mehr als eine Rennstrecke – sie ist ein Mythos. Automobilhersteller aus aller Welt nutzen sie als ultimativen Testparcours. Rekordversuche werden regelmäßig groß inszeniert und von Millionen verfolgt.'},
+    ]
+  },
+  {
+    id:'flaggen', icon:'🚩', label:'Flaggencodes', sub:'Was bedeutet was?',
+    title:'Flaggencodes beim Rennen',
+    facts:[
+      {label:'Grüne Flagge / Grünes Licht', text:'Freie Fahrt – das Rennen läuft normal. Kein besonderes Vorkommnis auf diesem Streckenabschnitt.'},
+      {label:'Gelbe Flagge', text:'Gefahr auf der Strecke – Überholverbot! Ein liegengebliebenes Fahrzeug, Trümmer oder ein Unfall liegt vor. Einmal geschwenkt = Gefahr, doppelt geschwenkt = direkte Gefahr, stark verlangsamen.'},
+      {label:'Rote Flagge / Code Red', text:'Das Rennen wird unterbrochen! Alle Fahrzeuge müssen sofort die Geschwindigkeit reduzieren und zur Box oder auf die Ideallinie zurückfallen. Häufig bei schweren Unfällen, Nebel oder gefährlichen Streckenabschnitten.'},
+      {label:'Safety Car (SC)', text:'Das Safety Car kommt auf die Strecke. Alle Fahrzeuge müssen sich dahinter einreihen, Überholen ist verboten. Das Feld wird zusammengeführt, zum Beispiel nach einem Unfall.'},
+      {label:'Code 60', text:'Pflichtlangsamfahrphase: Alle Fahrzeuge müssen auf einem bestimmten Streckenabschnitt die Geschwindigkeit auf maximal 60 km/h reduzieren. Wird oft genutzt um gefährliche Abschnitte zu sichern ohne das gesamte Rennen zu unterbrechen.'},
+      {label:'Schwarze Flagge', text:'Ein bestimmtes Fahrzeug wird disqualifiziert oder muss sofort in die Box kommen. Wird zusammen mit einer Startnummer gezeigt.'},
+      {label:'Karierte Flagge', text:'Ziel! Das Rennen ist beendet. Der erste Fahrer der die karierte Flagge sieht, hat gewonnen.'},
+    ]
+  },
+  {
+    id:'rekorde', icon:'⏱️', label:'Rekorde', sub:'Zahlen & Bestzeiten',
+    title:'Rekorde & Zahlen',
+    facts:[
+      {label:'Schnellstes Serienfahrzeug', hl:'6:43.300', text:'Porsche 911 GT2 RS MR (2018) – gefahren von Lars Kern. Dies ist die offizielle Rekordzeit für straßenzugelassene Serienfahrzeuge.'},
+      {label:'Absoluter Rundenrekord', hl:'5:19.546', text:'Porsche 919 Hybrid Evo (2018) – gefahren von Timo Bernhard. Das ehemalige Le-Mans-Siegerauto fuhr diese Zeit bei einem Rekordversuch ohne Rennreglement.'},
+      {label:'Meiste 24h-Siege', hl:'Audi', text:'Audi ist der erfolgreichste Hersteller beim 24h-Rennen. In den GT3-Ären dominierten wechselnd Porsche, BMW, Mercedes und Audi die Gesamtwertung.'},
+      {label:'Längster Regen-Einsatz', text:'Das 24h-Rennen 2015 war eines der nassesten in der Geschichte – über 20 Stunden Regen, mehrere Safety-Car-Phasen und Code-Red-Unterbrechungen. Mercedes gewann trotzdem.'},
+      {label:'Meiste Starter', hl:'223 Fahrzeuge', text:'Mit bis zu 223 Fahrzeugen im Starterfeld ist das 24h-Rennen eines der größten Autorennen der Welt nach Teilnehmerzahl.'},
+      {label:'Jüngster Sieger', text:'Der jüngste Gesamtsieger beim 24h-Rennen war Markus Winkelhock (2007), der nach einem überraschenden Führungsstart im Regen für Spyker eine Motorsport-Sensation schuf.'},
+    ]
+  },
+  {
+    id:'camping', icon:'⛺', label:'Camping & Fans', sub:'Das Nürburg-Erlebnis',
+    title:'Camping & Fans am Ring',
+    facts:[
+      {label:'Campingkultur', text:'Das Camping beim 24h-Rennen ist legendär. Zehntausende Fans campen direkt an der Strecke, viele schon Tage vor dem Rennen. Lagerfeuer, Grillabende und Fahrzeuge, die nachts an dir vorbeizischen – das ist das einzigartige Nürburgring-Feeling.'},
+      {label:'Beste Campingplätze', text:'Die bekanntesten Campingplätze sind "Brünnchen" (direkter Streckenblick auf eine der spektakulärsten Kurven), "Tiergarten" und "Flugplatz". Brünnchen gilt als der legendärste Platz – die Community dort ist riesig.'},
+      {label:'Fankultur', text:'Der Ring hat eine einzigartige Fankultur. Viele Besucher kommen jedes Jahr wieder, einige sogar seit Jahrzehnten. Es gibt regelrechte Stammtische und Gruppen, die ihren festen Platz am Streckenrand haben.'},
+      {label:'Tipps', text:'Früh anreisen lohnt sich – die besten Plätze direkt am Zaun sind schnell belegt. Warme Kleidung einpacken: Nachts wird es in der Eifel auch im Mai kalt. Und: Streckenkenntnis ist wichtig – der Weg zum Camping kann lang und unübersichtlich sein.'},
+      {label:'Verpflegung', text:'Rund um das Rennen gibt es zahlreiche Imbisse, Bierstände und Foodtrucks. Die Eifelküche – Döppekooche (Kartoffelkuchen), Wirsingeintopf und deftige Hausmannskost – ist ebenfalls ein Erlebnis wert.'},
+    ]
+  },
+];
+
+function initWissen() {
+  const list = document.getElementById('wissen-list');
+  if (list.innerHTML) return;
+  list.innerHTML = `<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">Thema wählen</div>
+    <div class="wissen-grid">${WISSEN.map(w=>`
+      <div class="wissen-chip" onclick="showWissenDetail('${w.id}')">
+        <div class="wissen-chip-icon">${w.icon}</div>
+        <div class="wissen-chip-label">${w.label}</div>
+        <div class="wissen-chip-sub">${w.sub}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+window.showWissenDetail = function(id) {
+  const w = WISSEN.find(x => x.id === id);
+  if (!w) return;
+  document.getElementById('wissen-list').style.display = 'none';
+  document.getElementById('wissen-detail').style.display = 'block';
+  document.getElementById('wissen-detail-content').innerHTML = `
+    <div class="wissen-detail-header">
+      <div class="wissen-detail-icon">${w.icon}</div>
+      <div class="wissen-detail-title">${w.title}</div>
+      <div class="wissen-detail-sub">${w.sub}</div>
+    </div>
+    ${w.facts.map(f=>`
+      <div class="wissen-fact">
+        <div class="wissen-fact-label">${f.label}</div>
+        ${f.hl ? `<div class="wissen-fact-highlight">${f.hl}</div>` : ''}
+        <div class="wissen-fact-text">${f.text}</div>
+      </div>`).join('')}`;
+};
+
+window.backToWissen = function() {
+  document.getElementById('wissen-list').style.display = '';
+  document.getElementById('wissen-detail').style.display = 'none';
+};
+
+// ─── QUIZ ────────────────────────────────────────────────────────
+const ALL_QUESTIONS = [
+  {q:'In welchem Jahr wurde die Nordschleife eröffnet?', opts:['1921','1927','1934','1952'], correct:1, exp:'Die Nordschleife wurde am 18. Juni 1927 nach nur 15 Monaten Bauzeit eröffnet.'},
+  {q:'Wie lang ist die Nordschleife?', opts:['20,8 km','22,3 km','25,378 km','28,5 km'], correct:2, exp:'Die Nordschleife ist exakt 25,378 km lang und hat 73 Kurven.'},
+  {q:'Wer prägte den Begriff "Grüne Hölle"?', opts:['Niki Lauda','Ayrton Senna','Jackie Stewart','Michael Schumacher'], correct:2, exp:'Jackie Stewart nannte die Strecke in den 1970ern "Green Hell" – wegen des Waldes, des Wetters und der Gefährlichkeit.'},
+  {q:'Was bedeutet eine rote Flagge beim 24h-Rennen?', opts:['Überholverbot','Safety Car kommt','Rennen unterbrochen (Code Red)','Disqualifikation eines Fahrers'], correct:2, exp:'Die rote Flagge bedeutet Rennunterbrechung. Alle Fahrzeuge müssen die Geschwindigkeit reduzieren – auch "Code Red" genannt.'},
+  {q:'Wie viele Kurven hat die Nordschleife?', opts:['58','65','73','81'], correct:2, exp:'Die Nordschleife hat genau 73 Kurven: 33 Linkskurven und 40 Rechtskurven.'},
+  {q:'Nach wem ist das Caracciola-Karussell benannt?', opts:['Alberto Ascari','Rudolf Caracciola','Juan Manuel Fangio','Hermann Lang'], correct:1, exp:'Das Karussell ist nach Rudolf Caracciola benannt, einem der erfolgreichsten deutschen Rennfahrer der 1930er Jahre.'},
+  {q:'Wie groß ist der Höhenunterschied auf der Nordschleife?', opts:['150 m','200 m','300 m','450 m'], correct:2, exp:'Der Höhenunterschied zwischen dem tiefsten und höchsten Punkt beträgt rund 300 Meter. Höchster Punkt: Hohe Acht (617 m ü.NN).'},
+  {q:'Wann fand das erste 24h-Rennen am Nürburgring statt?', opts:['1953','1963','1970','1978'], correct:2, exp:'Das erste 24h-Rennen am Nürburgring fand 1970 statt – zunächst als kleines Clubrennen, das über die Jahrzehnte zur Motorsport-Legende wurde.'},
+  {q:'Welches Fahrzeug hält den absoluten Rundenrekord der Nordschleife (5:19.546)?', opts:['Ferrari LaFerrari','Bugatti Chiron','Lamborghini Huracán','Porsche 919 Hybrid Evo'], correct:3, exp:'Der Porsche 919 Hybrid Evo fuhr 2018 mit Timo Bernhard die Zeit von 5:19.546 – als ehemaliger Le-Mans-Sieger außer Konkurrenz.'},
+  {q:'Was ist Code 60 beim Nürburgring-Rennen?', opts:['Fahrerwechsel-Signal','Maximaltempo 60 km/h auf einem Abschnitt','Anzahl der Pflichtstopps','Strafzeit in Sekunden'], correct:1, exp:'Code 60 bedeutet eine Pflichtlangsamfahrphase: Alle Fahrzeuge müssen auf dem betroffenen Abschnitt auf max. 60 km/h verlangsamen.'},
+  {q:'Welches Camping-Areal gilt als das legendärste am Nürburgring?', opts:['Tiergarten','Flugplatz','Brünnchen','Adenauer Forst'], correct:2, exp:'Das Camping am Brünnchen ist das legendärste – mit direktem Streckenblick auf eine der spektakulärsten Kurven der Nordschleife.'},
+  {q:'Wann verließ die Formel 1 die Nordschleife dauerhaft?', opts:['1970','1976','1984','1992'], correct:1, exp:'Nach dem schweren Unfall von Niki Lauda beim Grand Prix 1976 fanden keine Formel-1-Rennen mehr auf der Nordschleife statt.'},
+  {q:'Was bedeutet die karierte Flagge?', opts:['Safety Car','Überholverbot','Rennen beendet / Ziel','Strafankündigung'], correct:2, exp:'Die karierte Flagge signalisiert das Ziel – das Rennen ist beendet. Der erste Fahrer, der sie sieht, hat gewonnen.'},
+  {q:'Wie viele Fahrzeuge starten beim 24h-Rennen maximal?', opts:['80–100','120–140','150–180','über 200'], correct:3, exp:'Das 24h-Rennen hatte bis zu 223 Fahrzeuge im Starterfeld – damit eines der größten Autorennen der Welt.'},
+  {q:'Welche regionale Spezialität ist in der Eifel besonders bekannt?', opts:['Sauerbraten','Döppekooche (Kartoffelkuchen)','Currywurst','Maultaschen'], correct:1, exp:'Döppekooche ist ein traditioneller Eifel-Kartoffelkuchen – eine deftige lokale Spezialität, die rund ums Rennen an vielen Ständen angeboten wird.'},
+];
+
+let quizQuestions = [];
+let quizIndex = 0;
+let quizAnswers = [];
+let quizAnswered = false;
+
+function resetQuizView() {
+  document.getElementById('quiz-start').style.display = '';
+  document.getElementById('quiz-question').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+}
+
+window.startQuiz = function() {
+  quizQuestions = [...ALL_QUESTIONS].sort(()=>Math.random()-0.5).slice(0,10);
+  quizIndex = 0;
+  quizAnswers = [];
+  quizAnswered = false;
+  document.getElementById('quiz-start').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-question').style.display = 'block';
+  renderQuestion();
+};
+
+function renderQuestion() {
+  const q = quizQuestions[quizIndex];
+  const shuffled = q.opts.map((o,i)=>({o,i})).sort(()=>Math.random()-0.5);
+  const correctShuffled = shuffled.findIndex(x=>x.i===q.correct);
+  quizAnswered = false;
+  const progress = quizQuestions.map((_,i)=>{
+    let cls = 'quiz-prog-dot';
+    if(i < quizIndex) cls += quizAnswers[i]?.correct ? ' done' : ' wrong';
+    else if(i === quizIndex) cls += ' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+  document.getElementById('quiz-question').innerHTML = `
+    <div class="quiz-progress">${progress}</div>
+    <div class="quiz-q-card">
+      <div class="quiz-q-num">Frage ${quizIndex+1} von ${quizQuestions.length}</div>
+      <div class="quiz-q-text">${q.q}</div>
+    </div>
+    <div class="quiz-options">
+      ${shuffled.map((item,si)=>`<button class="quiz-opt" onclick="answerQuiz(${si},${correctShuffled},this)" data-idx="${si}">${item.o}</button>`).join('')}
+    </div>
+    <div id="quiz-exp" style="display:none" class="quiz-explanation"></div>
+    <button id="quiz-next" style="display:none" class="quiz-next-btn" onclick="nextQuestion()">${quizIndex+1 < quizQuestions.length ? 'Nächste Frage →' : 'Auswertung anzeigen 🏁'}</button>
+  `;
+}
+
+window.answerQuiz = function(selected, correctIdx, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const opts = document.querySelectorAll('.quiz-opt');
+  const isCorrect = selected === correctIdx;
+  quizAnswers.push({correct: isCorrect, q: quizQuestions[quizIndex].q, exp: quizQuestions[quizIndex].exp});
+  opts.forEach((o,i) => {
+    o.disabled = true;
+    if(i === correctIdx) o.classList.add('correct');
+    else if(i === selected && !isCorrect) o.classList.add('wrong');
+    else o.classList.add('reveal');
+  });
+  const expEl = document.getElementById('quiz-exp');
+  expEl.textContent = (isCorrect ? '✅ Richtig! ' : '❌ Falsch. ') + quizQuestions[quizIndex].exp;
+  expEl.style.display = 'block';
+  document.getElementById('quiz-next').style.display = 'block';
+};
+
+window.nextQuestion = function() {
+  quizIndex++;
+  if (quizIndex >= quizQuestions.length) {
+    showQuizResult();
+  } else {
+    renderQuestion();
+  }
+};
+
+function showQuizResult() {
+  document.getElementById('quiz-question').style.display = 'none';
+  const correct = quizAnswers.filter(a=>a.correct).length;
+  const pct = Math.round(correct/quizQuestions.length*100);
+  let msg, sub;
+  if(pct >= 90) { msg='Nordschleife-Experte! 🏆'; sub='Du kennst die Grüne Hölle wie deine Westentasche.'; }
+  else if(pct >= 70) { msg='Sehr gut! 🎉'; sub='Beeindruckendes Wissen über Ring und Renngeschichte.'; }
+  else if(pct >= 50) { msg='Solide Basis 👍'; sub='Noch ein bisschen Nachlesen im Wissenswertes-Tab, dann bist du perfekt vorbereitet!'; }
+  else { msg='Noch Luft nach oben 😅'; sub='Schau nochmal in den Wissenswertes-Tab – beim nächsten Versuch läuft es besser!'; }
+  const color = pct >= 70 ? 'var(--green)' : pct >= 50 ? '#EF9F27' : 'var(--red)';
+  document.getElementById('quiz-result').style.display = 'block';
+  document.getElementById('quiz-result').innerHTML = `
+    <div class="quiz-result-card">
+      <div class="quiz-score-big" style="color:${color}">${correct}/${quizQuestions.length}</div>
+      <div class="quiz-score-label">${pct}% richtig</div>
+      <div class="quiz-score-bar"><div class="quiz-score-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="quiz-result-msg">${msg}</div>
+      <div class="quiz-result-sub">${sub}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Antworten im Überblick</div>
+      <div class="quiz-answers-summary">
+        ${quizAnswers.map(a=>`<div class="quiz-ans-row">
+          <div class="quiz-ans-icon">${a.correct?'✅':'❌'}</div>
+          <div><div class="quiz-ans-q">${a.q}</div><div class="quiz-ans-a">${a.exp}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <button class="quiz-next-btn" onclick="startQuiz()">Nochmal spielen 🔄</button>
+  `;
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

@@ -390,6 +390,7 @@
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
       <button class="nav-btn" onclick="showSec('packliste',this)">📦 Packliste</button>
+      <button class="nav-btn" onclick="showSec('shuttle',this)">🚌 Shuttle</button>
     </div>
     <div class="main-scroll">
 
@@ -546,6 +547,81 @@
             </table>
           </div>
           <div id="pack-empty" class="pack-empty" style="display:none">Noch nichts eingetragen ✨</div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-shuttle">
+        <!-- Header -->
+        <div class="race-header" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:28px">🚌</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:2px">Fan-Shuttle Service</div>
+              <div style="font-size:11px;color:#aaa">24h Nürburgring 2026 · Schäfer Reisen</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fahrplan -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">🕐 Fahrplan</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Do · Fr · Sa</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">08:00 – 24:00 Uhr</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">Freitag bis 01:00 Uhr</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Sonntag</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">00:00 – 18:00 Uhr</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route 1 -->
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div style="background:#1a1a2e;color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0">Route 1</div>
+            <div style="font-size:11px;color:var(--text2)">Rundkurs · Nordschleife</div>
+          </div>
+          <div style="position:relative;padding-left:20px">
+            <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:600;color:var(--text)">Welcome Center</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Scharfer Kopf</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Umstieg auf beide Buslinien möglich</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Fahrsicherheitszentrum II</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Nur Fr zur Falken Drift Show</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Eifeldorf</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Zufahrt Parkplätze C1–C3</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Parkplatz C6a</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Hatzenbach / BMW Testcenter</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Schwalbenschwanz</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#4a8fd4;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Pflanzgarten</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:600;color:var(--text)">Brünnchen</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Endstation · Rückfahrt gleiche Route</div></div></div>
+          </div>
+        </div>
+
+        <!-- Route 2 -->
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div style="background:#2d5a27;color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0">Route 2</div>
+            <div style="font-size:11px;color:var(--text2)">Adenau-Linie</div>
+          </div>
+          <div style="position:relative;padding-left:20px">
+            <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px"></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:600;color:var(--text)">Scharfer Kopf</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Startpunkt</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Fahrsicherheitszentrum II</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Nur Fr zur Falken Drift Show</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Eifeldorf</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Zufahrt Parkplätze C1–C3</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Event Hub / Family &amp; Friends Areal</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Parkplatz C6a</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Quiddelbacher Höhe / Hatzenbach</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Breidscheid</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#2d9e27;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">Adenau Schule</div></div></div>
+            <div style="position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px"><div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:#e24b4a;flex-shrink:0;border:2px solid var(--surface)"></div><div><div style="font-size:13px;font-weight:600;color:var(--text)">Adenau Mitte – Hauptstraße</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Endstation · Rückfahrt über Breidscheid – Quiddelbacher Höhe – Scharfer Kopf</div></div></div>
+          </div>
+        </div>
+
+        <!-- Hinweis -->
+        <div style="background:rgba(74,143,212,0.1);border:0.5px solid rgba(74,143,212,0.3);border-radius:var(--r-lg);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.6">
+          💡 <strong style="color:var(--text)">Tipp:</strong> Am Scharfer Kopf kann zwischen beiden Routen gewechselt werden. Route 1 fährt entlang der Nordschleife-Highlights, Route 2 bringt euch nach Adenau.
         </div>
       </div>
 

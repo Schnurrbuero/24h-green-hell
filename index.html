@@ -1116,9 +1116,7 @@ function calcTransfers(expenses, members, payments) {
 
   expenses.forEach(e => {
     const amt = parseFloat(e.amount);
-    // Who paid
     if (members.includes(e.who)) paid[e.who] += amt;
-    // Who owes: splitWith or all members
     const splitters = (e.splitWith && e.splitWith.length > 0)
       ? e.splitWith.filter(m => members.includes(m))
       : members;
@@ -1126,17 +1124,24 @@ function calcTransfers(expenses, members, payments) {
     splitters.forEach(m => { owed[m] += share; });
   });
 
+  // Net balance per person BEFORE direct payments
+  // bal > 0 → person is owed money; bal < 0 → person owes money
   const directPayments = payments.map(p => ({...p, amount: parseFloat(p.amount)}));
-  const bals = members.map(m => {
-    let adj = paid[m] - owed[m];
-    directPayments.filter(p => p.from === m).forEach(p => { adj += p.amount; });
-    directPayments.filter(p => p.to === m).forEach(p => { adj -= p.amount; });
-    return {name:m, bal:+adj.toFixed(4)};
+
+  // Build a balance map: net = paid - owed
+  const netBal = {};
+  members.forEach(m => { netBal[m] = +(paid[m] - owed[m]).toFixed(4); });
+
+  // Apply direct payments: a direct payment from A to B means:
+  // A has already settled part of their debt → A's balance improves
+  // B has already received → B's balance decreases (they're owed less from the pool)
+  directPayments.forEach(p => {
+    if (members.includes(p.from)) netBal[p.from] = +(netBal[p.from] + p.amount).toFixed(4);
+    if (members.includes(p.to))   netBal[p.to]   = +(netBal[p.to]   - p.amount).toFixed(4);
   });
 
-  // For display: global total and average share
-  const avgShare = n > 0 ? total/n : 0;
-  const share = avgShare; // kept for compat
+  // Now run debt minimization on REMAINING balances (after direct payments)
+  const bals = members.map(m => ({name:m, bal: netBal[m]}));
   const d = bals.filter(b=>b.bal<-0.005).map(b=>({...b})).sort((a,b)=>a.bal-b.bal);
   const c = bals.filter(b=>b.bal>0.005).map(b=>({...b})).sort((a,b)=>b.bal-a.bal);
   const transfers = [];
@@ -1148,6 +1153,8 @@ function calcTransfers(expenses, members, payments) {
     if(Math.abs(d[di].bal)<0.005)di++;
     if(Math.abs(c[ci].bal)<0.005)ci++;
   }
+
+  const share = n > 0 ? total/n : 0; // kept for compat
   return {total, share, paid, owed, transfers};
 }
 

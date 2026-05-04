@@ -727,6 +727,9 @@ window.joinGroup = async function() {
 function enterApp(data) {
   groupSnapshot = data;
   document.getElementById('login-view').style.display = 'none';
+  // Restore nav in case it was hidden by logout
+  const nav = document.getElementById('main-nav');
+  if (nav) nav.style.display = '';
   const mv = document.getElementById('main-view');
   mv.style.display = 'flex';
   mv.style.flexDirection = 'column';
@@ -759,13 +762,22 @@ window.logout = function() {
   sessionStorage.removeItem('ring_group');
   localStorage.removeItem('ring_user');
   localStorage.removeItem('ring_group');
-  document.getElementById('login-view').style.display = '';
+  // Hide everything app-related
   document.getElementById('main-view').style.display = 'none';
   document.getElementById('group-bar').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'none';
+  // Hide the nav so only login form shows
+  const nav = document.getElementById('main-nav');
+  if (nav) nav.style.display = 'none';
+  // Show login
+  document.getElementById('login-view').style.display = '';
+  // Reset sections for next login
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-kosten').classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  // Reset password field
+  const pw = document.getElementById('join-password');
+  if (pw) pw.value = '';
 };
 
 function rebuildBuyerSelect() {

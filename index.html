@@ -434,6 +434,7 @@
             <input type="text" id="pay-desc" placeholder="Notiz (optional)" style="flex:1">
             <button class="btn-primary" onclick="addPaymentReceived()" style="flex:0 0 auto;padding:0 16px">Eintragen</button>
           </div>
+          <div id="pay-list" style="margin-top:12px"></div>
         </div>
       </div>
 
@@ -610,6 +611,25 @@
       <button class="btn-delete-exp" onclick="confirmDelete()" title="Löschen">🗑</button>
       <button class="btn-cancel" onclick="closeEditModal()">Abbruch</button>
       <button class="btn-save" onclick="saveEdit()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT EDIT MODAL -->
+<div id="pay-edit-modal" class="modal-overlay" style="display:none" onclick="closePayEditModal(event)">
+  <div class="modal-box">
+    <div class="modal-title">Zahlung bearbeiten</div>
+    <div class="modal-row">
+      <select id="pem-from" style="flex:1;width:auto"></select>
+    </div>
+    <div class="modal-row" style="margin-top:8px">
+      <input type="number" id="pem-amt" placeholder="Betrag €" step="0.01" min="0.01" style="flex:0 0 130px;width:auto">
+      <input type="text" id="pem-desc" placeholder="Notiz (optional)" style="flex:1;width:auto">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-delete-exp" onclick="confirmDeletePayment()" title="Löschen">🗑</button>
+      <button class="btn-cancel" onclick="closePayEditModal()">Abbruch</button>
+      <button class="btn-save" onclick="savePayEdit()">Speichern</button>
     </div>
   </div>
 </div>
@@ -853,11 +873,76 @@ function renderExpenses() {
   document.getElementById('share-val').textContent = '€ ' + (n > 0 ? total/n : 0).toFixed(2);
   const payments = Object.values(groupSnapshot?.payments || {});
   renderAbrechnung(expenses, members, payments);
+  renderPayList();
   // refresh pay-from dropdown
   const payFrom = document.getElementById('pay-from');
   if (payFrom) payFrom.innerHTML = members.filter(m => m !== currentUser)
     .map(m => `<option value="${m}">${m}</option>`).join('');
 }
+
+// ── Zahlungsliste rendern ──
+function renderPayList() {
+  const el = document.getElementById('pay-list');
+  if (!el) return;
+  const payments = Object.values(groupSnapshot?.payments || {});
+  const mine = payments.filter(p => p.to === currentUser);
+  if (mine.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Eingetragene Zahlungen</div>' +
+    mine.map(p => `
+      <div class="expense-item" style="align-items:center">
+        <span class="exp-who">${p.from}</span>
+        <span class="exp-desc">${p.desc || 'Zahlung erhalten'}</span>
+        <span class="exp-amount">€ ${parseFloat(p.amount).toFixed(2)}</span>
+        <button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten">✏️</button>
+      </div>`).join('');
+}
+
+let editingPayId = null;
+
+window.openPayEditModal = function(id) {
+  const payments = groupSnapshot?.payments || {};
+  const p = payments[id];
+  if (!p) return;
+  editingPayId = id;
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  const fromSel = document.getElementById('pem-from');
+  fromSel.innerHTML = members.filter(m => m !== currentUser)
+    .map(m => `<option value="${m}"${m===p.from?' selected':''}>${m}</option>`).join('');
+  document.getElementById('pem-amt').value  = parseFloat(p.amount).toFixed(2);
+  document.getElementById('pem-desc').value = p.desc || '';
+  document.getElementById('pay-edit-modal').style.display = 'flex';
+};
+
+window.closePayEditModal = function(event) {
+  if (event && event.target !== document.getElementById('pay-edit-modal')) return;
+  document.getElementById('pay-edit-modal').style.display = 'none';
+  editingPayId = null;
+};
+
+window.savePayEdit = async function() {
+  if (!editingPayId) return;
+  const from = document.getElementById('pem-from').value;
+  const amt  = parseFloat(document.getElementById('pem-amt').value);
+  const desc = document.getElementById('pem-desc').value.trim() || 'Zahlung erhalten';
+  if (!from || isNaN(amt) || amt <= 0) { alert('Bitte Person und Betrag angeben.'); return; }
+  try {
+    await set(ref(db, 'groups/' + currentGroupKey + '/payments/' + editingPayId), {
+      id: editingPayId, from, to: currentUser, amount: amt, desc, ts: Date.now()
+    });
+    document.getElementById('pay-edit-modal').style.display = 'none';
+    editingPayId = null;
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+window.confirmDeletePayment = async function() {
+  if (!editingPayId) return;
+  if (!confirm('Zahlung wirklich löschen?')) return;
+  try {
+    await remove(ref(db, 'groups/' + currentGroupKey + '/payments/' + editingPayId));
+    document.getElementById('pay-edit-modal').style.display = 'none';
+    editingPayId = null;
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
 
 window.addPaymentReceived = async function() {
   const from = document.getElementById('pay-from').value;
@@ -868,9 +953,8 @@ window.addPaymentReceived = async function() {
   // This represents: currentUser received money FROM 'from'
   // In settlement: from pays currentUser directly, so we add it as a payment entry
   try {
-    await push(ref(db, 'groups/' + currentGroupKey + '/payments'), {
-      from, to: currentUser, amount: amt, desc, ts: Date.now()
-    });
+    const newPayRef = push(ref(db, 'groups/' + currentGroupKey + '/payments'));
+    await set(newPayRef, { id: newPayRef.key, from, to: currentUser, amount: amt, desc, ts: Date.now() });
     document.getElementById('pay-amt').value = '';
     document.getElementById('pay-desc').value = '';
   } catch(e) { alert('Fehler: ' + e.message); }
@@ -1058,10 +1142,12 @@ function renderAbrechnung(expenses, members, payments) {
     const directHtml = myDirect.length > 0
       ? myDirect.map(p => {
           const isPayer = p.from === person;
-          return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;padding:4px 8px;margin-bottom:3px">
+          const canEdit = p.to === currentUser;
+          return `<div class="payment-row" style="background:rgba(74,143,212,0.08);border-radius:6px;padding:4px 8px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;font-weight:600;color:#4a8fd4">${isPayer ? '✓ BEZAHLT' : '✓ ERHALTEN'}</span>
-            <span style="font-size:11px;color:var(--text2)">${isPayer ? 'an '+p.to : 'von '+p.from}</span>
+            <span style="font-size:11px;color:var(--text2)">${isPayer ? 'an '+p.to : 'von '+p.from}${p.desc && p.desc!=='Zahlung erhalten' ? ' · '+p.desc : ''}</span>
             <span style="margin-left:auto;font-weight:600;color:#4a8fd4">€ ${parseFloat(p.amount).toFixed(2)}</span>
+            ${canEdit ? `<button class="edit-btn" onclick="openPayEditModal('${p.id}')" title="Bearbeiten" style="flex-shrink:0">✏️</button>` : ''}
           </div>`;
         }).join('') : '';
     const myPaymentRows = myT.length > 0

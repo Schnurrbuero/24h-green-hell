@@ -148,6 +148,14 @@
     .pack-delete-btn { background:none; border:none; cursor:pointer; font-size:14px;
       color:var(--text3); padding:0 2px; opacity:0.6; }
     .pack-delete-btn:hover { opacity:1; }
+    /* Splitten-Checkboxen */
+    .split-label { display:inline-flex; align-items:center; gap:5px; font-size:12px;
+      color:var(--text2); cursor:pointer; padding:3px 8px; border-radius:20px;
+      border:0.5px solid var(--border2); background:var(--surface); user-select:none; }
+    .split-label input { accent-color:var(--red); width:14px; height:14px; cursor:pointer; }
+    .split-label.checked { background:rgba(226,75,74,0.12); border-color:var(--red); color:var(--text); font-weight:500; }
+    .split-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .split-hint { font-size:11px; color:var(--text2); margin-top:6px; }
     .payment-row { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 0 3px 44px; }
     .pay-none { font-size: 12px; color: var(--text3); padding: 3px 0 0 44px; }
 
@@ -394,6 +402,11 @@
           <div class="form-row">
             <input type="number" id="amt-in" placeholder="Betrag €" step="0.01" min="0" style="width:auto;flex:0 0 115px" />
             <button class="btn-primary" style="flex:1" onclick="addExp()">+ Hinzufügen</button>
+          </div>
+          <div style="margin-top:10px">
+            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Aufteilen auf</div>
+            <div class="split-row" id="split-checks"></div>
+            <div class="split-hint" id="split-hint"></div>
           </div>
         </div>
         <div class="card">
@@ -794,6 +807,19 @@ function rebuildBuyerSelect() {
   const payFrom = document.getElementById('pay-from');
   if (payFrom) payFrom.innerHTML = members.filter(m => m !== currentUser)
     .map(m => `<option value="${m}">${m}</option>`).join('');
+  // Build split checkboxes (all checked by default)
+  const splitRow = document.getElementById('split-checks');
+  if (splitRow) {
+    const existing = Array.from(splitRow.querySelectorAll('input[type=checkbox]'))
+      .filter(cb => cb.checked).map(cb => cb.value);
+    splitRow.innerHTML = members.map(m => {
+      const checked = existing.length === 0 || existing.includes(m);
+      return `<label class="split-label${checked?' checked':''}" onclick="toggleSplitLabel(this)">
+        <input type="checkbox" value="${m}"${checked?' checked':''} onchange="updateSplitHint()"> ${m}
+      </label>`;
+    }).join('');
+    updateSplitHint();
+  }
 }
 
 function renderExpenses() {
@@ -805,14 +831,20 @@ function renderExpenses() {
 
   const list = document.getElementById('exp-list');
   list.innerHTML = expenses.length
-    ? expenses.map(e => `<div class="expense-item">
-        <span class="exp-who">${e.who}</span>
-        <span class="exp-desc">${e.desc}</span>
-        <span class="exp-amount">€ ${parseFloat(e.amount).toFixed(2)}</span>
-        ${e.who===currentUser
-          ? `<button class="edit-btn" onclick="openEditModal('${e.id}')" title="Bearbeiten">✏️</button>`
-          : '<span style="width:26px;display:inline-block"></span>'}
-      </div>`).join('')
+    ? expenses.map(e => {
+        const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+        const splitters = (e.splitWith && e.splitWith.length > 0 && e.splitWith.length < members.length)
+          ? ` <span style="font-size:10px;color:var(--text2);background:var(--surface2);border-radius:4px;padding:1px 5px">${e.splitWith.join(', ')}</span>`
+          : '';
+        return `<div class="expense-item">
+          <span class="exp-who">${e.who}</span>
+          <span class="exp-desc">${e.desc}${splitters}</span>
+          <span class="exp-amount">€ ${parseFloat(e.amount).toFixed(2)}</span>
+          ${e.who===currentUser
+            ? `<button class="edit-btn" onclick="openEditModal('${e.id}')" title="Bearbeiten">✏️</button>`
+            : '<span style="width:26px;display:inline-block"></span>'}
+        </div>`;
+      }).join('')
     : '<div style="font-size:13px;color:var(--text2);padding:16px 0;text-align:center">Noch keine Ausgaben</div>';
 
   document.getElementById('exp-count').textContent = '(' + expenses.length + ')';
@@ -849,11 +881,51 @@ window.addExp = async function() {
   const desc = document.getElementById('desc-in').value.trim();
   const amt = parseFloat(document.getElementById('amt-in').value);
   if (!desc||isNaN(amt)||amt<=0) return;
+  // Collect checked split members
+  const checks = document.querySelectorAll('#split-checks input[type=checkbox]:checked');
+  const splitWith = checks.length > 0 ? Array.from(checks).map(cb => cb.value) : null;
   try {
-    await push(ref(db, 'groups/' + currentGroupKey + '/expenses'), { who, desc, amount: amt, ts: Date.now() });
+    const expData = { who, desc, amount: amt, ts: Date.now() };
+    if (splitWith) expData.splitWith = splitWith;
+    await push(ref(db, 'groups/' + currentGroupKey + '/expenses'), expData);
     document.getElementById('desc-in').value = '';
     document.getElementById('amt-in').value = '';
+    // Reset all checkboxes to checked
+    document.querySelectorAll('#split-checks input[type=checkbox]').forEach(cb => {
+      cb.checked = true;
+      cb.closest('label').classList.add('checked');
+    });
+    updateSplitHint();
   } catch(e) { alert('Fehler beim Speichern: ' + e.message); }
+};
+
+window.toggleSplitLabel = function(label) {
+  // Toggle handled by checkbox change, just update style
+  setTimeout(() => {
+    const cb = label.querySelector('input');
+    label.classList.toggle('checked', cb.checked);
+    updateSplitHint();
+  }, 0);
+};
+
+window.updateSplitHint = function() {
+  const checks = document.querySelectorAll('#split-checks input[type=checkbox]');
+  const checked = Array.from(checks).filter(cb => cb.checked);
+  const hint = document.getElementById('split-hint');
+  if (!hint) return;
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  if (checked.length === 0) {
+    hint.textContent = '⚠️ Mindestens eine Person auswählen';
+    hint.style.color = 'var(--red)';
+  } else if (checked.length === members.length) {
+    hint.textContent = 'Wird auf alle aufgeteilt';
+    hint.style.color = 'var(--text2)';
+  } else {
+    const amt = parseFloat(document.getElementById('amt-in').value) || 0;
+    const share = amt > 0 ? (amt / checked.length).toFixed(2) : '—';
+    hint.textContent = `Wird auf ${checked.length} Person${checked.length!==1?'en':''} aufgeteilt (je € ${share})`;
+    hint.style.color = 'var(--text2)';
+  }
 };
 
 window.delExp = async function(id) {
@@ -916,22 +988,35 @@ function calcTransfers(expenses, members, payments) {
   payments = payments || [];
   const n = members.length;
   const total = expenses.reduce((s,e) => s + parseFloat(e.amount), 0);
-  const share = n > 0 ? total/n : 0;
+
+  // Per-person share: each expense may have a custom splitWith list
   const paid = {};
-  members.forEach(m => paid[m] = 0);
-  expenses.forEach(e => { if (members.includes(e.who)) paid[e.who] += parseFloat(e.amount); });
-  // Direct payments: from person paid 'to' person directly
-  // This increases 'from' person's paid amount (they've settled their debt)
-  // and is recorded separately to show in settlement
+  const owed = {};
+  members.forEach(m => { paid[m] = 0; owed[m] = 0; });
+
+  expenses.forEach(e => {
+    const amt = parseFloat(e.amount);
+    // Who paid
+    if (members.includes(e.who)) paid[e.who] += amt;
+    // Who owes: splitWith or all members
+    const splitters = (e.splitWith && e.splitWith.length > 0)
+      ? e.splitWith.filter(m => members.includes(m))
+      : members;
+    const share = splitters.length > 0 ? amt / splitters.length : 0;
+    splitters.forEach(m => { owed[m] += share; });
+  });
+
   const directPayments = payments.map(p => ({...p, amount: parseFloat(p.amount)}));
   const bals = members.map(m => {
-    let adj = paid[m] - share;
-    // Add direct payments made by this person (they paid, so less debt)
+    let adj = paid[m] - owed[m];
     directPayments.filter(p => p.from === m).forEach(p => { adj += p.amount; });
-    // Subtract payments received by this person from others (they got paid)
     directPayments.filter(p => p.to === m).forEach(p => { adj -= p.amount; });
     return {name:m, bal:+adj.toFixed(4)};
   });
+
+  // For display: global total and average share
+  const avgShare = n > 0 ? total/n : 0;
+  const share = avgShare; // kept for compat
   const d = bals.filter(b=>b.bal<-0.005).map(b=>({...b})).sort((a,b)=>a.bal-b.bal);
   const c = bals.filter(b=>b.bal>0.005).map(b=>({...b})).sort((a,b)=>b.bal-a.bal);
   const transfers = [];
@@ -943,12 +1028,12 @@ function calcTransfers(expenses, members, payments) {
     if(Math.abs(d[di].bal)<0.005)di++;
     if(Math.abs(c[ci].bal)<0.005)ci++;
   }
-  return {total, share, paid, transfers};
+  return {total, share, paid, owed, transfers};
 }
 
 function renderAbrechnung(expenses, members, payments) {
   payments = payments || [];
-  const {total, share, paid, transfers} = calcTransfers(expenses, members, payments);
+  const {total, share, paid, owed, transfers} = calcTransfers(expenses, members, payments);
   document.getElementById('members-chips').innerHTML = members.map((m,i) => {
     const p = PALETTES[i % PALETTES.length];
     return `<div class="member-chip"><div class="member-av" style="background:${p.bg};color:${p.fg}">${m.slice(0,2).toUpperCase()}</div>${m}</div>`;
@@ -1009,7 +1094,7 @@ function renderAbrechnung(expenses, members, payments) {
         <div class="avatar" style="background:${p.bg};color:${p.fg}">${person.slice(0,2).toUpperCase()}</div>
         <div>
           <div class="person-name-txt">${person}${person===currentUser?' (du)':''}</div>
-          <div class="person-meta">bezahlt: € ${paid[person].toFixed(2)} · Anteil: € ${share.toFixed(2)}</div>
+          <div class="person-meta">bezahlt: € ${paid[person].toFixed(2)} · Anteil: € ${owed[person].toFixed(2)}</div>
         </div>
         ${chip}
       </div>

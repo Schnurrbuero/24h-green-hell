@@ -38,6 +38,7 @@
     }
     html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); }
     .app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+    .app-top { position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
     .header { background: #1a1a2e; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
     .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
@@ -291,6 +292,7 @@
 </div>
 
 <div class="app" id="app" style="display:none">
+  <div class="app-top">
   <div class="header">
     <div class="header-inner">
       <div>
@@ -368,6 +370,7 @@
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
       <button class="nav-btn" onclick="showSec('packliste',this)">📦 Packliste</button>
     </div>
+  </div><!-- /app-top -->
     <div class="main-scroll">
 
       <div class="section active" id="sec-kosten">
@@ -476,13 +479,25 @@
             <button class="pack-filter-btn" onclick="filterPack('erledigt',this)">Erledigt</button>
             <button class="pack-filter-btn" onclick="filterPack('ich',this)">Meine</button>
           </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+            <span style="font-size:11px;color:var(--text2);font-weight:600">Filtern:</span>
+            <select id="pack-filter-who" onchange="renderPackliste()" style="font-size:11px;height:28px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);padding:0 6px">
+              <option value="">Alle Personen</option>
+            </select>
+            <select id="pack-filter-cat" onchange="renderPackliste()" style="font-size:11px;height:28px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);padding:0 6px">
+              <option value="">Alle Kategorien</option>
+              <option value="Essen & Trinken">🍺 Essen</option>
+              <option value="Ausrüstung">⛺ Ausrüstung</option>
+              <option value="Sonstiges">📦 Sonstiges</option>
+            </select>
+          </div>
           <div style="overflow-x:auto">
             <table class="pack-table">
               <thead><tr>
                 <th style="width:28px"></th>
-                <th>Was</th>
-                <th>Wer</th>
-                <th>Kategorie</th>
+                <th onclick="sortPack('name')" style="cursor:pointer;user-select:none">Was <span id="sort-name-icon">⇅</span></th>
+                <th onclick="sortPack('who')" style="cursor:pointer;user-select:none">Wer <span id="sort-who-icon">⇅</span></th>
+                <th onclick="sortPack('cat')" style="cursor:pointer;user-select:none">Kategorie <span id="sort-cat-icon">⇅</span></th>
                 <th style="width:30px"></th>
               </tr></thead>
               <tbody id="pack-tbody"></tbody>
@@ -497,7 +512,6 @@
             <select id="pack-cat" style="flex:0 0 120px;width:auto">
               <option value="Essen & Trinken">🍺 Essen</option>
               <option value="Ausrüstung">⛺ Ausrüstung</option>
-              <option value="Fahrzeug">🚗 Fahrzeug</option>
               <option value="Sonstiges">📦 Sonstiges</option>
             </select>
           </div>
@@ -764,7 +778,7 @@ function rebuildBuyerSelect() {
 function renderExpenses() {
   const expObj = groupSnapshot?.expenses || {};
   const expenses = Object.entries(expObj).map(([id, e]) => ({id, ...e}))
-    .sort((a,b) => (a.ts||0)-(b.ts||0));
+    .sort((a,b) => (a.ts||0)-(b.ts||0));  // initial order preserved, sort applied below
   const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
   const n = members.length;
 
@@ -998,6 +1012,7 @@ window.toggleBreakdown = function(idx, btn) {
 // PACKLISTE
 // ═══════════════════════════════════════════
 let packFilter = 'alle';
+let packSort   = { col: 'ts', dir: 1 };
 const PACK_COLORS = [
   {bg:'#1a1a2e',fg:'#fff'},{bg:'#2d5a27',fg:'#fff'},{bg:'#8b1a1a',fg:'#fff'},
   {bg:'#1a3a5c',fg:'#fff'},{bg:'#5c3a1a',fg:'#fff'},{bg:'#3a1a5c',fg:'#fff'},
@@ -1013,10 +1028,17 @@ function renderPackliste() {
   const items   = Object.values(groupSnapshot?.packliste || {})
     .sort((a,b) => (a.ts||0)-(b.ts||0));
 
-  // update who-dropdown
+  // update who-dropdown (add form)
   const whoSel = document.getElementById('pack-who');
   if (whoSel) whoSel.innerHTML = members.map(m =>
     `<option value="${m}"${m===currentUser?' selected':''}>${m}</option>`).join('');
+  // update filter-who dropdown
+  const fWho = document.getElementById('pack-filter-who');
+  if (fWho) {
+    const cur = fWho.value;
+    fWho.innerHTML = '<option value="">Alle Personen</option>' +
+      members.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+  }
 
   const done  = items.filter(i => i.done).length;
   const total = items.length;
@@ -1027,11 +1049,27 @@ function renderPackliste() {
   const bar = document.getElementById('pack-bar');
   if (bar) bar.style.width = pct + '%';
 
-  // apply filter
+  // apply status filter
   let filtered = items;
   if (packFilter === 'offen')    filtered = items.filter(i => !i.done);
   if (packFilter === 'erledigt') filtered = items.filter(i => i.done);
   if (packFilter === 'ich')      filtered = items.filter(i => i.who === currentUser);
+  // apply column filters
+  const fWhoVal = document.getElementById('pack-filter-who')?.value || '';
+  const fCatVal = document.getElementById('pack-filter-cat')?.value || '';
+  if (fWhoVal) filtered = filtered.filter(i => i.who === fWhoVal);
+  if (fCatVal) filtered = filtered.filter(i => (i.cat||'Sonstiges') === fCatVal);
+  // apply sort
+  filtered = [...filtered].sort((a,b) => {
+    const av = (a[packSort.col]||'').toString().toLowerCase();
+    const bv = (b[packSort.col]||'').toString().toLowerCase();
+    return av < bv ? -packSort.dir : av > bv ? packSort.dir : 0;
+  });
+  // update sort icons
+  ['name','who','cat'].forEach(col => {
+    const el = document.getElementById('sort-'+col+'-icon');
+    if (el) el.textContent = packSort.col===col ? (packSort.dir===1?'↑':'↓') : '⇅';
+  });
 
   const tbody  = document.getElementById('pack-tbody');
   const emptyEl = document.getElementById('pack-empty');
@@ -1071,6 +1109,16 @@ window.filterPack = function(f, btn) {
   packFilter = f;
   document.querySelectorAll('.pack-filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  renderPackliste();
+};
+
+window.sortPack = function(col) {
+  if (packSort.col === col) {
+    packSort.dir *= -1;  // toggle direction
+  } else {
+    packSort.col = col;
+    packSort.dir = 1;
+  }
   renderPackliste();
 };
 

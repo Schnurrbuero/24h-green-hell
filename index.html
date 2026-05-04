@@ -584,6 +584,29 @@
     </div>
   </div><!-- /main-view -->
 
+<!-- PACK EDIT MODAL -->
+<div id="pack-edit-modal" class="modal-overlay" style="display:none" onclick="closePackEditModal(event)">
+  <div class="modal-box">
+    <div class="modal-title">Eintrag bearbeiten</div>
+    <div class="modal-row">
+      <input type="text" id="pem-name" placeholder="Was?" style="flex:1;width:auto">
+      <select id="pem-cat" style="flex:0 0 130px;width:auto">
+        <option value="Essen &amp; Trinken">🍺 Essen</option>
+        <option value="Ausrüstung">⛺ Ausrüstung</option>
+        <option value="Sonstiges">📦 Sonstiges</option>
+      </select>
+    </div>
+    <div class="modal-row" style="margin-top:8px">
+      <select id="pem-who" style="flex:1;width:auto"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-delete-exp" onclick="confirmDeletePackItem()" title="Löschen">🗑</button>
+      <button class="btn-cancel" onclick="closePackEditModal()">Abbruch</button>
+      <button class="btn-save" onclick="savePackEdit()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <!-- STRECKE POPUP -->
 <div id="strecke-popup" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center" onclick="closeStreckePopup(event)">
   <div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:680px;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 20px);max-height:75vh;overflow-y:auto">
@@ -1534,9 +1557,9 @@ function renderPackliste() {
           </span>
         </td>
         <td><span class="pack-cat-badge">${item.cat || 'Sonstiges'}</span></td>
-        <td>
+        <td style="white-space:nowrap">
           ${canDelete
-            ? `<button class="pack-delete-btn" onclick="deletePackItem('${item.id}')" title="Löschen">🗑</button>`
+            ? `<button class="pack-delete-btn" onclick="openPackEditModal('${item.id}')" title="Bearbeiten" style="margin-right:2px">✏️</button>`
             : ''}
         </td>
       </tr>`;
@@ -1570,6 +1593,57 @@ window.addPackItem = async function() {
     const newRef = push(ref(db, 'groups/' + currentGroupKey + '/packliste'));
     await set(newRef, { id: newRef.key, name, who, cat, done: false, ts: Date.now() });
     document.getElementById('pack-item').value = '';
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+let editingPackId = null;
+
+window.openPackEditModal = function(id) {
+  const items = groupSnapshot?.packliste || {};
+  const item = items[id];
+  if (!item) return;
+  editingPackId = id;
+  const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
+  document.getElementById('pem-name').value = item.name || '';
+  const catSel = document.getElementById('pem-cat');
+  Array.from(catSel.options).forEach(o => o.selected = o.value === (item.cat || 'Sonstiges'));
+  const whoSel = document.getElementById('pem-who');
+  whoSel.innerHTML = members.map(m =>
+    `<option value="${m}"${m===item.who?' selected':''}>${m}</option>`).join('');
+  document.getElementById('pack-edit-modal').style.display = 'flex';
+};
+
+window.closePackEditModal = function(event) {
+  if (event && event.target !== document.getElementById('pack-edit-modal')) return;
+  document.getElementById('pack-edit-modal').style.display = 'none';
+  editingPackId = null;
+};
+
+window.savePackEdit = async function() {
+  if (!editingPackId) return;
+  const name = document.getElementById('pem-name').value.trim();
+  const cat  = document.getElementById('pem-cat').value;
+  const who  = document.getElementById('pem-who').value;
+  if (!name) { document.getElementById('pem-name').focus(); return; }
+  const existing = groupSnapshot?.packliste?.[editingPackId] || {};
+  try {
+    await set(ref(db, 'groups/' + currentGroupKey + '/packliste/' + editingPackId), {
+      ...existing, name, cat, who
+    });
+    document.getElementById('pack-edit-modal').style.display = 'none';
+    editingPackId = null;
+  } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+window.confirmDeletePackItem = async function() {
+  if (!editingPackId) return;
+  const item = groupSnapshot?.packliste?.[editingPackId];
+  const label = item ? item.name : 'Eintrag';
+  if (!confirm(`"${label}" wirklich löschen?`)) return;
+  try {
+    await remove(ref(db, 'groups/' + currentGroupKey + '/packliste/' + editingPackId));
+    document.getElementById('pack-edit-modal').style.display = 'none';
+    editingPackId = null;
   } catch(e) { alert('Fehler: ' + e.message); }
 };
 

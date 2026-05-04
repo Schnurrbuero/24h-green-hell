@@ -40,6 +40,7 @@
     .app { max-width: 680px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
     @media (max-width: 680px) { .app { max-width: 100%; } }
     .app-top { position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+    .js-hidden { display: none !important; }
     .header { background: #1a1a2e; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
     .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
@@ -364,7 +365,7 @@
   </div>
 
   <!-- MAIN APP -->
-  <div id="main-view" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+  <div id="main-view" class="js-hidden" style="flex:1;overflow:hidden;flex-direction:column">
     <div class="nav" id="main-nav">
       <button class="nav-btn active" onclick="showSec('kosten',this)">Kosten</button>
       <button class="nav-btn" onclick="showSec('abrechnung',this)">Abrechnung</button>
@@ -650,6 +651,10 @@ async function tryAutoLogin(user, groupName) {
       currentUser = user;
       currentGroupKey = groupKey(groupName);
       enterApp(snap.val());
+    } else {
+      // Group not found - clear saved credentials
+      localStorage.removeItem('ring_user');
+      localStorage.removeItem('ring_group');
     }
   } catch(e) {}
 }
@@ -726,15 +731,13 @@ window.joinGroup = async function() {
 
 function enterApp(data) {
   groupSnapshot = data;
-  document.getElementById('login-view').style.display = 'none';
-  // Restore nav in case it was hidden by logout
+  // Hide login, show app
+  document.getElementById('login-view').classList.add('js-hidden');
+  document.getElementById('main-view').classList.remove('js-hidden');
+  // Restore nav
   const nav = document.getElementById('main-nav');
-  if (nav) nav.style.display = '';
-  const mv = document.getElementById('main-view');
-  mv.style.display = 'flex';
-  mv.style.flexDirection = 'column';
-  mv.style.flex = '1';
-  mv.style.overflow = 'hidden';
+  if (nav) nav.classList.remove('js-hidden');
+  // group bar
   document.getElementById('group-bar').style.display = 'flex';
   document.getElementById('bar-group-name').textContent = '📍 ' + (data.displayName || currentGroupKey);
   document.getElementById('bar-user-name').textContent = 'Eingeloggt als: ' + currentUser;
@@ -762,20 +765,19 @@ window.logout = function() {
   sessionStorage.removeItem('ring_group');
   localStorage.removeItem('ring_user');
   localStorage.removeItem('ring_group');
-  // Hide everything app-related
-  document.getElementById('main-view').style.display = 'none';
+  // Hide app content
+  document.getElementById('main-view').classList.add('js-hidden');
   document.getElementById('group-bar').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'none';
-  // Hide the nav so only login form shows
   const nav = document.getElementById('main-nav');
-  if (nav) nav.style.display = 'none';
+  if (nav) nav.classList.add('js-hidden');
   // Show login
-  document.getElementById('login-view').style.display = '';
+  document.getElementById('login-view').classList.remove('js-hidden');
   // Reset sections for next login
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-kosten').classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-  // Reset password field
+  // Clear password
   const pw = document.getElementById('join-password');
   if (pw) pw.value = '';
 };

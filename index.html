@@ -41,6 +41,12 @@
     @media (max-width: 680px) { .app { max-width: 100%; } }
     .app-top { position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
     .js-hidden { display: none !important; }
+    /* login-view visible by default, hidden after login */
+    #login-view { display: block; }
+    #login-view.js-hidden { display: none !important; }
+    /* main-view hidden by default until JS shows it */
+    #main-view { display: none; }
+    #main-view.visible { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
     .header { background: #1a1a2e; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
     .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
@@ -296,7 +302,7 @@
   <p>Verbinde mit Firebase…</p>
 </div>
 
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
   <div class="app-top">
   <div class="header">
     <div class="header-inner">
@@ -365,7 +371,7 @@
   </div>
 
   <!-- MAIN APP -->
-  <div id="main-view" class="js-hidden" style="flex:1;overflow:hidden;flex-direction:column">
+  <div id="main-view">
     <div class="nav" id="main-nav">
       <button class="nav-btn active" onclick="showSec('kosten',this)">Kosten</button>
       <button class="nav-btn" onclick="showSec('abrechnung',this)">Abrechnung</button>
@@ -630,8 +636,7 @@ function groupKey(name) { return name.toLowerCase().replace(/[^a-z0-9]/g,'_'); }
 
 // Hide loading overlay once Firebase is ready
 document.getElementById('loading-overlay').style.display = 'none';
-document.getElementById('app').style.display = 'flex';
-document.getElementById('app').style.flexDirection = 'column';
+// app visibility handled by CSS
 
 // Try auto-login: localStorage (remember me) or sessionStorage
 const savedUser  = localStorage.getItem('ring_user')  || sessionStorage.getItem('ring_user');
@@ -733,7 +738,7 @@ function enterApp(data) {
   groupSnapshot = data;
   // Hide login, show app
   document.getElementById('login-view').classList.add('js-hidden');
-  document.getElementById('main-view').classList.remove('js-hidden');
+  document.getElementById('main-view').classList.add('visible');
   // Restore nav
   const nav = document.getElementById('main-nav');
   if (nav) nav.classList.remove('js-hidden');
@@ -766,7 +771,7 @@ window.logout = function() {
   localStorage.removeItem('ring_user');
   localStorage.removeItem('ring_group');
   // Hide app content
-  document.getElementById('main-view').classList.add('js-hidden');
+  document.getElementById('main-view').classList.remove('visible');
   document.getElementById('group-bar').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'none';
   const nav = document.getElementById('main-nav');

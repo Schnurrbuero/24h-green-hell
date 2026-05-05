@@ -40,14 +40,14 @@
     html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); overflow-x: hidden; max-width: 100%; }
     .app { max-width: 680px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; overflow-x: hidden; width: 100%; }
     @media (max-width: 680px) { .app { max-width: 100%; } }
-    .app-top { position: sticky; top: 0; z-index: 100; flex-shrink: 0; width: 100%; }
+    .app-top { position: sticky; top: 0; z-index: 100; flex-shrink: 0; width: 100%; background: #1a2a0a; }
     .js-hidden { display: none !important; }
     /* login-view visible by default, hidden after login */
     #login-view { display: block; }
     #login-view.js-hidden { display: none !important; }
     /* main-view hidden by default until JS shows it */
     #main-view { display: none; }
-    #main-view.visible { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    #main-view.visible { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
     .header { background: #1a2a0a; color: white; padding-top: env(safe-area-inset-top, 0); flex-shrink: 0; }
     .header-inner { padding: 14px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 16px; font-weight: 500; color: #f0f0f0; }
@@ -60,7 +60,7 @@
     .logout-btn { background: none; border: none; color: var(--red); font-size: 12px; cursor: pointer; }
     .sync-indicator { font-size: 10px; color: #4ade80; display: flex; align-items: center; gap: 4px; }
     .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
-    .nav { display: flex; background: var(--surface); border-bottom: 0.5px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; -webkit-overflow-scrolling: touch; position: sticky; top: 0; z-index: 99; }
+    .nav { display: flex; background: var(--surface); border-bottom: 0.5px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
     @media (min-width: 560px) { .nav { flex-wrap: wrap; overflow-x: visible; } }
     .nav::-webkit-scrollbar { display: none; }
     .nav-btn { flex-shrink: 0; padding: 10px 14px; font-size: 12px; font-weight: 500; color: var(--text2); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
@@ -126,10 +126,10 @@
     .chip-neg { color: var(--red); }
     .chip-zero { color: var(--text3); }
     /* ── Packliste ── */
-    .pack-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .pack-table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
     .pack-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase;
       letter-spacing:0.6px; color:var(--text2); padding:0 8px 8px; border-bottom:1px solid var(--border); }
-    .pack-table td { padding:10px 8px; border-bottom:0.5px solid var(--border); vertical-align:middle; }
+    .pack-table td { padding:10px 8px; border-bottom:0.5px solid var(--border); vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:0; }
     .pack-table tr:last-child td { border-bottom:none; }
     .pack-done td { opacity:0.45; }
     .pack-done .pack-item-name { text-decoration:line-through; }
@@ -391,10 +391,8 @@
     </div>
   </div>
 
-  <!-- MAIN APP -->
-  </div><!-- /app-top -->
-  <div id="main-view">
-    <div class="nav" id="main-nav">
+  <!-- NAV MENU -->
+    <div class="nav" id="main-nav" style="display:none">
       <button class="nav-btn active" onclick="showSec('packliste',this)">📦 Packliste</button>
       <button class="nav-btn" onclick="showSec('kosten',this)">Kosten</button>
       <button class="nav-btn" onclick="showSec('abrechnung',this)">Abrechnung</button>
@@ -407,6 +405,8 @@
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
     </div>
+  </div><!-- /app-top -->
+  <div id="main-view">
     <div class="main-scroll">
 
       <div class="section" id="sec-kosten">
@@ -549,7 +549,7 @@
               <option value="Sonstiges">📦 Sonstiges</option>
             </select>
           </div>
-          <div style="overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch">
+          <div style="overflow-x:hidden;width:100%">
             <table class="pack-table">
               <thead><tr>
                 <th style="width:28px"></th>
@@ -1193,6 +1193,7 @@ function enterApp(data) {
   // nav is inside main-view, shown with it
   // group bar
   document.getElementById('group-bar').style.display = 'flex';
+  document.getElementById('main-nav').style.display = 'flex';
   document.getElementById('bar-group-name').textContent = '📍 ' + (data.displayName || currentGroupKey);
   document.getElementById('bar-user-name').textContent = 'Eingeloggt als: ' + currentUser;
   document.getElementById('sync-indicator').style.display = 'flex';
@@ -1254,6 +1255,7 @@ window.logout = function() {
   // Hide app content
   document.getElementById('main-view').classList.remove('visible');
   document.getElementById('group-bar').style.display = 'none';
+  document.getElementById('main-nav').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'none';
   // nav is inside main-view, hidden with it
   // Show login

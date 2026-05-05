@@ -133,6 +133,10 @@
     .pack-table tr:last-child td { border-bottom:none; }
     .pack-done td { opacity:0.45; }
     .pack-done .pack-item-name { text-decoration:line-through; }
+    .pack-in-car td { opacity:0.6; }
+    .pack-in-car .pack-item-name { text-decoration:line-through; color:var(--green); }
+    .pack-check-label { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer }
+    .pack-check-label span { font-size:8px;color:var(--text2);text-align:center;line-height:1.1;max-width:36px }
     .pack-who-badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 7px;
       border-radius:20px; white-space:nowrap; }
     .pack-check { width:20px; height:20px; cursor:pointer; accent-color:var(--red); }
@@ -1927,19 +1931,20 @@ function renderPackliste() {
       members.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
   }
 
-  const done  = items.filter(i => i.done).length;
+  const done  = items.filter(i => i.done || i.inCar).length;
+  const inCar = items.filter(i => i.inCar).length;
   const total = items.length;
   const pct   = total > 0 ? Math.round(done/total*100) : 0;
 
   const statEl = document.getElementById('pack-stats');
-  if (statEl) statEl.textContent = total > 0 ? `${done} / ${total} erledigt (${pct}%)` : '';
+  if (statEl) statEl.textContent = total > 0 ? `${done} / ${total} organisiert · ${inCar} im Auto (${pct}%)` : '';
   const bar = document.getElementById('pack-bar');
   if (bar) bar.style.width = pct + '%';
 
   // apply status filter
   let filtered = items;
   if (packFilter === 'offen')    filtered = items.filter(i => !i.done);
-  if (packFilter === 'erledigt') filtered = items.filter(i => i.done);
+  if (packFilter === 'erledigt') filtered = items.filter(i => i.done || i.inCar);
   if (packFilter === 'ich')      filtered = items.filter(i => i.who === currentUser);
   // apply column filters
   const fWhoVal = document.getElementById('pack-filter-who')?.value || '';
@@ -1970,10 +1975,17 @@ function renderPackliste() {
     tbody.innerHTML = filtered.map(item => {
       const col = getMemberColor(item.who, members);
       const canDelete = item.who === currentUser;
-      return `<tr class="${item.done ? 'pack-done' : ''}" id="packrow-${item.id}">
-        <td>
-          <input type="checkbox" class="pack-check" ${item.done ? 'checked' : ''}
-            onchange="togglePackItem('${item.id}', this.checked)">
+      const rowClass = item.inCar ? 'pack-in-car' : (item.done ? 'pack-done' : '');
+      return `<tr class="${rowClass}" id="packrow-${item.id}">
+        <td style="text-align:center">
+          <input type="checkbox" class="pack-check" ${item.done||item.inCar ? 'checked' : ''}
+            onchange="togglePackItem('${item.id}', this.checked)"
+            style="accent-color:var(--red)">
+        </td>
+        <td style="text-align:center">
+          <input type="checkbox" class="pack-check" ${item.inCar ? 'checked' : ''}
+            onchange="togglePackInCar('${item.id}', this.checked)"
+            style="accent-color:#4ade80">
         </td>
         <td><span class="pack-item-name">${item.name}</span></td>
         <td>
@@ -2016,7 +2028,7 @@ window.addPackItem = async function() {
   if (!name) { document.getElementById('pack-item').focus(); return; }
   try {
     const newRef = push(ref(db, 'groups/' + currentGroupKey + '/packliste'));
-    await set(newRef, { id: newRef.key, name, who, cat, done: false, ts: Date.now() });
+    await set(newRef, { id: newRef.key, name, who, cat, done: false, inCar: false, ts: Date.now() });
     document.getElementById('pack-item').value = '';
   } catch(e) { alert('Fehler: ' + e.message); }
 };
@@ -2070,6 +2082,15 @@ window.confirmDeletePackItem = async function() {
     document.getElementById('pack-edit-modal').style.display = 'none';
     editingPackId = null;
   } catch(e) { alert('Fehler: ' + e.message); }
+};
+
+window.togglePackInCar = async function(id, checked) {
+  try {
+    const updates = { inCar: checked };
+    if (checked) updates.done = true; // inCar implies organised
+    await set(ref(db, 'groups/' + currentGroupKey + '/packliste/' + id + '/inCar'), checked);
+    if (checked) await set(ref(db, 'groups/' + currentGroupKey + '/packliste/' + id + '/done'), true);
+  } catch(e) { console.warn(e); }
 };
 
 window.togglePackItem = async function(id, checked) {

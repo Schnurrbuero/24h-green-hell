@@ -411,7 +411,7 @@
       <button class="nav-btn" onclick="showSec('strecke',this)">Strecke</button>
       <button class="nav-btn" onclick="showSec('wetter',this)">Wetter</button>
       <button class="nav-btn" onclick="showSec('camping',this)">⛺ Camping</button>
-      <button class="nav-btn" onclick="showSec('karte',this)">🗺 Karte</button>
+      <button class="nav-btn" onclick="showSec('karte',this)">🗺 Campingzones</button>
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
     </div>
@@ -504,8 +504,8 @@
 
       <div class="section" id="sec-karte" style="padding:0;height:100%;min-height:0">
         <div style="padding:10px 14px 6px;flex-shrink:0">
-          <div style="font-size:14px;font-weight:700;margin-bottom:1px">🗺 Geländekarte</div>
-          <div style="font-size:10px;color:#aaa">Camping · Strecke · Eventpoints</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:1px">🗺 Campingzones & Eventpoints</div>
+          <div style="font-size:10px;color:#aaa">maps.24h-rennen.de</div>
         </div>
         <iframe
           src="https://maps.24h-rennen.de/"
@@ -612,12 +612,6 @@
             <span style="font-size:11px;color:var(--text2);font-weight:600">Filtern:</span>
             <select id="pack-filter-who" onchange="renderPackliste()" style="font-size:11px;height:28px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);padding:0 6px">
               <option value="">Alle Personen</option>
-            </select>
-            <select id="pack-filter-cat" onchange="renderPackliste()" style="font-size:11px;height:28px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);padding:0 6px">
-              <option value="">Alle Kategorien</option>
-              <option value="Essen & Trinken">🍺 Essen</option>
-              <option value="Ausrüstung">⛺ Ausrüstung</option>
-              <option value="Sonstiges">📦 Sonstiges</option>
             </select>
           </div>
           <div style="overflow-x:hidden;width:100%">

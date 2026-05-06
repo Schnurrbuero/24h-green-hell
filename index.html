@@ -1957,7 +1957,7 @@ function renderPackliste() {
   let filtered = items;
   if (packFilter === 'offen-org')  filtered = items.filter(i => !i.done && !i.inCar);
   if (packFilter === 'offen-auto') filtered = items.filter(i => !i.inCar);
-  if (packFilter === 'erl-org')    filtered = items.filter(i => i.done && !i.inCar);
+  if (packFilter === 'erl-org')    filtered = items.filter(i => i.done || i.inCar);
   if (packFilter === 'erl-auto')   filtered = items.filter(i => i.inCar);
   if (packFilter === 'ich')        filtered = items.filter(i => i.who === currentUser);
   // apply column filters

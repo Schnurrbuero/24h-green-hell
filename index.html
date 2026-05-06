@@ -1305,7 +1305,7 @@ window.logout = function() {
   document.getElementById('login-view').classList.remove('js-hidden');
   // Reset sections for next login
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-kosten').classList.add('active');
+  document.getElementById('sec-packliste').classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===0));
   // Clear password
   const pw = document.getElementById('join-password');

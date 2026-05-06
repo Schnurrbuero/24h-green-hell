@@ -2067,10 +2067,10 @@ window.closePackEditModal = function(event) {
 window.savePackEdit = async function() {
   if (!editingPackId) return;
   const name = document.getElementById('pem-name').value.trim();
-  const cat  = existing.cat || 'Sonstiges';
   const who  = document.getElementById('pem-who').value;
   if (!name) { document.getElementById('pem-name').focus(); return; }
   const existing = groupSnapshot?.packliste?.[editingPackId] || {};
+  const cat  = existing.cat || 'Sonstiges';
   try {
     await set(ref(db, 'groups/' + currentGroupKey + '/packliste/' + editingPackId), {
       ...existing, name, cat, who

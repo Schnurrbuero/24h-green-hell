@@ -410,6 +410,7 @@
       <button class="nav-btn" onclick="showSec('strecke',this)">Strecke</button>
       <button class="nav-btn" onclick="showSec('wetter',this)">Wetter</button>
       <button class="nav-btn" onclick="showSec('camping',this)">⛺ Camping</button>
+      <button class="nav-btn" onclick="showSec('karte',this)">🗺 Karte</button>
       <button class="nav-btn" onclick="showSec('wissen',this)">Wissenswertes</button>
       <button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
     </div>
@@ -498,6 +499,27 @@
         </div>
         <div id="quiz-question" style="display:none"></div>
         <div id="quiz-result" style="display:none"></div>
+      </div>
+
+      <div class="section" id="sec-karte" style="padding:0">
+        <div style="padding:14px 14px 8px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:24px">🗺</span>
+            <div>
+              <div style="font-size:15px;font-weight:700">Geländekarte</div>
+              <div style="font-size:11px;color:#aaa">Camping · Strecke · Eventpoints</div>
+            </div>
+          </div>
+          <!-- Legend -->
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:11px;color:var(--text2)">
+            <span>⛺ Camping</span>
+            <span>🏁 Strecke</span>
+            <span>🎪 Events</span>
+            <span>🚌 Shuttle</span>
+            <span>🅿️ Parken</span>
+          </div>
+        </div>
+        <div id="ring-map" style="width:100%;height:calc(100vh - 220px);min-height:350px"></div>
       </div>
 
       <div class="section" id="sec-livetiming">
@@ -2243,6 +2265,77 @@ window.toggleCamp = function(header) {
   setInterval(updateCountdown, 1000);
 })();
 
+// ── KARTE ──
+let ringMap = null;
+
+function initRingMap() {
+  if (ringMap) { ringMap.invalidateSize(); return; }
+
+  // Load Leaflet JS dynamically
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  script.onload = function() {
+    ringMap = L.map('ring-map', { zoomControl: true }).setView([50.3356, 6.9475], 14);
+
+    // Dark tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap © CartoDB',
+      subdomains: 'abcd', maxZoom: 19
+    }).addTo(ringMap);
+
+    // Helper: custom icon
+    function icon(emoji, color) {
+      return L.divIcon({
+        html: `<div style="background:${color};border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)">${emoji}</div>`,
+        className: '', iconSize: [32,32], iconAnchor: [16,16], popupAnchor: [0,-16]
+      });
+    }
+
+    // ── CAMPINGPLÄTZE ──
+    const camps = [
+      { pos:[50.3312, 6.9402], name:'Bereich C3 – Goodyear-Kehre', note:'Family & Friends · reservierbar · Strom inkl.', emoji:'⭐', color:'#e24b4a' },
+      { pos:[50.3198, 6.9721], name:'Brünnchen', note:'Direkt an der Nordschleife · legendäre Atmosphäre', emoji:'⛺', color:'#2d6b1a' },
+      { pos:[50.3248, 6.9611], name:'Pflanzgarten', note:'Nordschleife · günstig · sehr beliebt', emoji:'⛺', color:'#2d6b1a' },
+      { pos:[50.3289, 6.9387], name:'Tiergarten', note:'Ruhiger · gute Infrastruktur', emoji:'⛺', color:'#2d6b1a' },
+      { pos:[50.3342, 6.9501], name:'GP-Infield', note:'Teuerste Option · nahe Boxengasse', emoji:'⛺', color:'#2d6b1a' },
+      { pos:[50.3301, 6.9472], name:'Bereich C1 / C2', note:'Bedarfscampingzone · kein Vorverkauf', emoji:'🅿️', color:'#4a8fd4' },
+    ];
+
+    // ── EVENTPOINTS ──
+    const events = [
+      { pos:[50.3356, 6.9437], name:'Fahrerlager & Boxengasse', note:'Pitwalk Fr 19:30–21:00 · Autogrammstunde', emoji:'🏎', color:'#e24b4a' },
+      { pos:[50.3367, 6.9418], name:'ring°boulevard', note:'Shops & Gastronomie · Do–Sa 9–22 Uhr', emoji:'🛍', color:'#f59e0b' },
+      { pos:[50.3371, 6.9425], name:'RAVENOL Riesenrad', note:'Do–Sa in Betrieb · toller Überblick', emoji:'🎡', color:'#8b5cf6' },
+      { pos:[50.3360, 6.9428], name:'Start / Ziel', note:'Rennstart Sa 15:00 Uhr · Zieleinlauf So 15:00', emoji:'🏁', color:'#ffd700' },
+      { pos:[50.3238, 6.9487], name:'Goodyear-Kehre', note:'Früher Dunlop-Kehre · direkt am C3-Camp', emoji:'🔄', color:'#e24b4a' },
+    ];
+
+    // ── SHUTTLE-STOPS ──
+    const shuttles = [
+      { pos:[50.3477, 6.9325], name:'Scharfer Kopf', note:'Umstieg Route 1 & 2', emoji:'🚌', color:'#4a8fd4' },
+      { pos:[50.2938, 6.9388], name:'Adenau Mitte', note:'Route 2 Endstation', emoji:'🚌', color:'#4a8fd4' },
+      { pos:[50.3198, 6.9721], name:'Brünnchen (Shuttle)', note:'Route 1 Endstation', emoji:'🚌', color:'#4a8fd4' },
+    ];
+
+    [...camps, ...events, ...shuttles].forEach(p => {
+      L.marker(p.pos, { icon: icon(p.emoji, p.color) })
+        .addTo(ringMap)
+        .bindPopup(`<strong style="font-size:13px">${p.emoji} ${p.name}</strong><br><span style="font-size:11px;color:#666">${p.note}</span>`);
+    });
+
+    // Nordschleife outline (simplified key points)
+    const track = [
+      [50.3356,6.9437],[50.3412,6.9501],[50.3456,6.9598],[50.3478,6.9712],
+      [50.3445,6.9834],[50.3398,6.9923],[50.3312,7.0012],[50.3245,7.0089],
+      [50.3198,6.9998],[50.3156,6.9878],[50.3112,6.9756],[50.3089,6.9634],
+      [50.3098,6.9523],[50.3134,6.9423],[50.3189,6.9345],[50.3245,6.9312],
+      [50.3289,6.9289],[50.3312,6.9345],[50.3334,6.9401],[50.3356,6.9437]
+    ];
+    L.polyline(track, { color:'#e24b4a', weight:3, opacity:0.7, dashArray:'8,4' }).addTo(ringMap);
+  };
+  document.head.appendChild(script);
+}
+
 window.showSec = function(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2253,6 +2346,7 @@ window.showSec = function(id, btn) {
   if (id === 'quiz') resetQuizView();
   if (id === 'strecke') { buildStreckeSVG(); setTimeout(initMapGestures, 100); }
   if (id === 'packliste') renderPackliste();
+  if (id === 'karte') setTimeout(initRingMap, 50);
 };
 
 // ── WMO weather code → emoji + label ──

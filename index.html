@@ -1027,11 +1027,6 @@
     <div class="modal-title">Eintrag bearbeiten</div>
     <div class="modal-row">
       <input type="text" id="pem-name" placeholder="Was?" style="flex:1;width:auto">
-      <select id="pem-cat" style="flex:0 0 130px;width:auto">
-        <option value="Essen &amp; Trinken">🍺 Essen</option>
-        <option value="Ausrüstung">⛺ Ausrüstung</option>
-        <option value="Sonstiges">📦 Sonstiges</option>
-      </select>
     </div>
     <div class="modal-row" style="margin-top:8px">
       <select id="pem-who" style="flex:1;width:auto"></select>
@@ -2056,8 +2051,7 @@ window.openPackEditModal = function(id) {
   editingPackId = id;
   const members = groupSnapshot?.members ? Object.keys(groupSnapshot.members) : [];
   document.getElementById('pem-name').value = item.name || '';
-  const catSel = document.getElementById('pem-cat');
-  Array.from(catSel.options).forEach(o => o.selected = o.value === (item.cat || 'Sonstiges'));
+
   const whoSel = document.getElementById('pem-who');
   whoSel.innerHTML = members.map(m =>
     `<option value="${m}"${m===item.who?' selected':''}>${m}</option>`).join('');
@@ -2073,7 +2067,7 @@ window.closePackEditModal = function(event) {
 window.savePackEdit = async function() {
   if (!editingPackId) return;
   const name = document.getElementById('pem-name').value.trim();
-  const cat  = document.getElementById('pem-cat').value;
+  const cat  = existing.cat || 'Sonstiges';
   const who  = document.getElementById('pem-who').value;
   if (!name) { document.getElementById('pem-name').focus(); return; }
   const existing = groupSnapshot?.packliste?.[editingPackId] || {};

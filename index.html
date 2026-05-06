@@ -68,6 +68,7 @@
     .nav-btn.active { color: var(--text); border-bottom-color: var(--red); }
     .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .section { display: none; padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 14px); }
+    #sec-karte.visible { display: flex; flex-direction: column; padding: 0; height: 100%; }
     @media (min-width: 560px) { .section { padding: 18px 24px 32px; } }
     .section.active { display: block; }
     .card { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); padding: 14px; margin-bottom: 12px; }
@@ -501,14 +502,14 @@
         <div id="quiz-result" style="display:none"></div>
       </div>
 
-      <div class="section" id="sec-karte" style="padding:0;display:flex;flex-direction:column">
-        <div style="padding:12px 14px 8px;flex-shrink:0">
-          <div style="font-size:15px;font-weight:700;margin-bottom:2px">🗺 Geländekarte</div>
-          <div style="font-size:11px;color:#aaa">Camping · Strecke · Eventpoints · maps.24h-rennen.de</div>
+      <div class="section" id="sec-karte" style="padding:0;display:flex;flex-direction:column;height:100%;min-height:0">
+        <div style="padding:10px 14px 6px;flex-shrink:0">
+          <div style="font-size:14px;font-weight:700;margin-bottom:1px">🗺 Geländekarte</div>
+          <div style="font-size:10px;color:#aaa">Camping · Strecke · Eventpoints</div>
         </div>
         <iframe
           src="https://maps.24h-rennen.de/"
-          style="flex:1;width:100%;height:calc(100vh - 160px);border:none;display:block"
+          style="flex:1;width:100%;min-height:0;border:none;display:block"
           loading="lazy"
           allowfullscreen>
         </iframe>

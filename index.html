@@ -599,8 +599,10 @@
           <div class="pack-progress" style="margin-bottom:14px"><div id="pack-bar-car" style="height:100%;width:0%;background:#4ade80;transition:width 0.4s"></div></div>
           <div class="pack-filter-row" id="pack-filters">
             <button class="pack-filter-btn active" onclick="filterPack('alle',this)">Alle</button>
-            <button class="pack-filter-btn" onclick="filterPack('offen',this)">Offen</button>
-            <button class="pack-filter-btn" onclick="filterPack('erledigt',this)">Erledigt</button>
+            <button class="pack-filter-btn" onclick="filterPack('offen-org',this)">✅ Offen</button>
+            <button class="pack-filter-btn" onclick="filterPack('offen-auto',this)">🚗 Offen</button>
+            <button class="pack-filter-btn" onclick="filterPack('erl-org',this)">✅ Erledigt</button>
+            <button class="pack-filter-btn" onclick="filterPack('erl-auto',this)">🚗 Erledigt</button>
             <button class="pack-filter-btn" onclick="filterPack('ich',this)">Meine</button>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
@@ -1953,9 +1955,11 @@ function renderPackliste() {
 
   // apply status filter
   let filtered = items;
-  if (packFilter === 'offen')    filtered = items.filter(i => !i.done);
-  if (packFilter === 'erledigt') filtered = items.filter(i => i.done || i.inCar);
-  if (packFilter === 'ich')      filtered = items.filter(i => i.who === currentUser);
+  if (packFilter === 'offen-org')  filtered = items.filter(i => !i.done && !i.inCar);
+  if (packFilter === 'offen-auto') filtered = items.filter(i => i.done && !i.inCar);
+  if (packFilter === 'erl-org')    filtered = items.filter(i => i.done && !i.inCar);
+  if (packFilter === 'erl-auto')   filtered = items.filter(i => i.inCar);
+  if (packFilter === 'ich')        filtered = items.filter(i => i.who === currentUser);
   // apply column filters
   const fWhoVal = document.getElementById('pack-filter-who')?.value || '';
   const fCatVal = document.getElementById('pack-filter-cat')?.value || '';
@@ -2015,7 +2019,7 @@ function renderPackliste() {
 
 window.filterPack = function(f, btn) {
   packFilter = f;
-  document.querySelectorAll('.pack-filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#sec-packliste .pack-filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderPackliste();
 };

@@ -1946,6 +1946,9 @@ function renderPackliste() {
   }
   const bar = document.getElementById('pack-bar');
   if (bar) bar.style.width = pct + '%';
+  const barCar = document.getElementById('pack-bar-car');
+  const pctCar2 = total > 0 ? Math.round(inCar/total*100) : 0;
+  if (barCar) barCar.style.width = pctCar2 + '%';
 
   // apply status filter
   let filtered = items;

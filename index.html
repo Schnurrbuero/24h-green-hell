@@ -68,7 +68,7 @@
     .nav-btn.active { color: var(--text); border-bottom-color: var(--red); }
     .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .section { display: none; padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 14px); }
-    #sec-karte.visible { display: flex; flex-direction: column; padding: 0; height: 100%; }
+    #sec-karte.visible { display: flex; flex-direction: column; padding: 0; height: 100%; min-height: 0; }
     @media (min-width: 560px) { .section { padding: 18px 24px 32px; } }
     .section.active { display: block; }
     .card { background: var(--surface); border-radius: var(--r-lg); border: 0.5px solid var(--border); padding: 14px; margin-bottom: 12px; }
@@ -509,7 +509,7 @@
         </div>
         <iframe
           src="https://maps.24h-rennen.de/"
-          style="flex:1;width:100%;min-height:0;border:none;display:block"
+          style="flex:1;width:100%;height:calc(100vh - 160px);min-height:0;border:none;display:block"
           loading="lazy"
           allowfullscreen>
         </iframe>

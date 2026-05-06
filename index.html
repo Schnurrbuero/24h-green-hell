@@ -579,15 +579,10 @@
           <div class="card-title">Eintrag hinzufügen</div>
           <div class="pack-add-row">
             <input type="text" id="pack-item" placeholder="Was? z.B. Campingkocher" style="flex:1">
-            <select id="pack-cat" style="flex:0 0 120px;width:auto">
-              <option value="Essen & Trinken">🍺 Essen</option>
-              <option value="Ausrüstung">⛺ Ausrüstung</option>
-              <option value="Sonstiges">📦 Sonstiges</option>
-            </select>
+            <select id="pack-who" style="flex:0 0 110px;width:auto"></select>
           </div>
           <div class="pack-add-row" style="margin-top:8px">
-            <select id="pack-who" style="flex:1;width:auto"></select>
-            <button class="btn-primary" onclick="addPackItem()" style="flex:0 0 auto;padding:0 18px">+ Hinzufügen</button>
+            <button class="btn-primary" onclick="addPackItem()" style="width:100%">+ Hinzufügen</button>
           </div>
         </div>
         <div class="card">
@@ -2043,7 +2038,7 @@ window.sortPack = function(col) {
 window.addPackItem = async function() {
   const name = document.getElementById('pack-item').value.trim();
   const who  = document.getElementById('pack-who').value;
-  const cat  = document.getElementById('pack-cat').value;
+  const cat  = 'Sonstiges';
   if (!name) { document.getElementById('pack-item').focus(); return; }
   try {
     const newRef = push(ref(db, 'groups/' + currentGroupKey + '/packliste'));

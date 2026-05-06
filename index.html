@@ -578,9 +578,14 @@
         <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div class="card-title" style="margin:0">Was wer mitbringt</div>
-            <div id="pack-stats" style="font-size:11px;color:var(--text2)"></div>
           </div>
-          <div class="pack-progress" style="margin-bottom:4px"><div class="pack-progress-bar" id="pack-bar" style="width:0%"></div></div>
+          <div id="pack-stat-org" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:3px">
+            <span>✅ Organisiert</span><span id="pack-stat-org-val"></span>
+          </div>
+          <div class="pack-progress" style="margin-bottom:8px"><div class="pack-progress-bar" id="pack-bar" style="width:0%"></div></div>
+          <div id="pack-stat-car" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:3px">
+            <span>🚗 Im Auto</span><span id="pack-stat-car-val"></span>
+          </div>
           <div class="pack-progress" style="margin-bottom:14px"><div class="pack-progress-bar" id="pack-bar-car" style="width:0%;background:#4ade80"></div></div>
           <div class="pack-filter-row" id="pack-filters">
             <button class="pack-filter-btn active" onclick="filterPack('alle',this)">Alle</button>
@@ -1937,19 +1942,15 @@ function renderPackliste() {
   const total = items.length;
   const pct   = total > 0 ? Math.round(done/total*100) : 0;
 
-  const statEl = document.getElementById('pack-stats');
-  if (statEl) {
-    const pctCar = total > 0 ? Math.round(inCar/total*100) : 0;
-    statEl.innerHTML = total > 0
-      ? `<div>✅ Organisiert: <strong>${done} / ${total}</strong> (${pct}%)</div>
-         <div>🚗 Im Auto: <strong>${inCar} / ${total}</strong> (${pctCar}%)</div>`
-      : '';
-  }
+  const pctCar = total > 0 ? Math.round(inCar/total*100) : 0;
+  const orgVal = document.getElementById('pack-stat-org-val');
+  const carVal = document.getElementById('pack-stat-car-val');
+  if (orgVal) orgVal.textContent = total > 0 ? `${done} / ${total} (${pct}%)` : '';
+  if (carVal) carVal.textContent = total > 0 ? `${inCar} / ${total} (${pctCar}%)` : '';
   const bar = document.getElementById('pack-bar');
   if (bar) bar.style.width = pct + '%';
   const barCar = document.getElementById('pack-bar-car');
-  const pctCar2 = total > 0 ? Math.round(inCar/total*100) : 0;
-  if (barCar) barCar.style.width = pctCar2 + '%';
+  if (barCar) barCar.style.width = pctCar + '%';
 
   // apply status filter
   let filtered = items;
